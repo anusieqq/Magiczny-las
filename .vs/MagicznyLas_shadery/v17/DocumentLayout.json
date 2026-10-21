@@ -1,0 +1,97 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\annaz\\MagicznyLas_shadery\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{F4070050-EEEE-EDED-5A13-9A7323FC1267}|Assembly-CSharp.csproj|c:\\users\\annaz\\magicznylas_shadery\\assets\\scripts\\playercontroler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F4070050-EEEE-EDED-5A13-9A7323FC1267}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\playercontroler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F4070050-EEEE-EDED-5A13-9A7323FC1267}|Assembly-CSharp.csproj|C:\\Users\\annaz\\MagicznyLas_shadery\\assets\\shaders\\mgla.shader||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{F4070050-EEEE-EDED-5A13-9A7323FC1267}|Assembly-CSharp.csproj|solutionrelative:assets\\shaders\\mgla.shader||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F4070050-EEEE-EDED-5A13-9A7323FC1267}|Assembly-CSharp.csproj|C:\\Users\\annaz\\MagicznyLas_shadery\\assets\\scripts\\playerfog.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F4070050-EEEE-EDED-5A13-9A7323FC1267}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\playerfog.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F4070050-EEEE-EDED-5A13-9A7323FC1267}|Assembly-CSharp.csproj|C:\\Users\\annaz\\MagicznyLas_shadery\\assets\\shaders\\krysztal.shader||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{F4070050-EEEE-EDED-5A13-9A7323FC1267}|Assembly-CSharp.csproj|solutionrelative:assets\\shaders\\krysztal.shader||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 3,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:129:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "PlayerControler.cs",
+              "DocumentMoniker": "C:\\Users\\annaz\\MagicznyLas_shadery\\Assets\\Scripts\\PlayerControler.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\PlayerControler.cs",
+              "ToolTip": "C:\\Users\\annaz\\MagicznyLas_shadery\\Assets\\Scripts\\PlayerControler.cs",
+              "RelativeToolTip": "Assets\\Scripts\\PlayerControler.cs",
+              "ViewState": "AQIAAHQAAAAAAAAAAAAIwJEAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-19T17:14:50.798Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "PlayerFog.cs",
+              "DocumentMoniker": "C:\\Users\\annaz\\MagicznyLas_shadery\\Assets\\Scripts\\PlayerFog.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\PlayerFog.cs",
+              "ToolTip": "C:\\Users\\annaz\\MagicznyLas_shadery\\Assets\\Scripts\\PlayerFog.cs",
+              "RelativeToolTip": "Assets\\Scripts\\PlayerFog.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAACQAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-19T17:11:20.422Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Mgla.shader",
+              "DocumentMoniker": "C:\\Users\\annaz\\MagicznyLas_shadery\\Assets\\Shaders\\Mgla.shader",
+              "RelativeDocumentMoniker": "Assets\\Shaders\\Mgla.shader",
+              "ToolTip": "C:\\Users\\annaz\\MagicznyLas_shadery\\Assets\\Shaders\\Mgla.shader",
+              "RelativeToolTip": "Assets\\Shaders\\Mgla.shader",
+              "ViewState": "AQIAABQBAAAAAAAAAAAqwDMBAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002777|",
+              "WhenOpened": "2026-10-19T16:53:20.549Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Krysztal.shader",
+              "DocumentMoniker": "C:\\Users\\annaz\\MagicznyLas_shadery\\Assets\\Shaders\\Krysztal.shader",
+              "RelativeDocumentMoniker": "Assets\\Shaders\\Krysztal.shader",
+              "ToolTip": "C:\\Users\\annaz\\MagicznyLas_shadery\\Assets\\Shaders\\Krysztal.shader",
+              "RelativeToolTip": "Assets\\Shaders\\Krysztal.shader",
+              "ViewState": "AQIAAFIAAAAAAAAAAAAswHEAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002777|",
+              "WhenOpened": "2026-10-19T16:49:33.27Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
