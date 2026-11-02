@@ -43,6 +43,7 @@ Shader "MagicznyLas/Texture With Bloom"
 
             #pragma vertex Vert
             #pragma fragment Frag
+            #pragma multi_compile_instancing
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
@@ -68,6 +69,8 @@ Shader "MagicznyLas/Texture With Bloom"
             {
                 float4 positionOS : POSITION;
                 float2 uv : TEXCOORD0;
+
+                UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
             struct Varyings
@@ -75,19 +78,24 @@ Shader "MagicznyLas/Texture With Bloom"
                 float4 positionHCS : SV_POSITION;
                 float2 uv : TEXCOORD0;
                 float localHeight : TEXCOORD1;
+
+                UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
             Varyings Vert(Attributes input)
             {
-                Varyings output;
+                Varyings output = (Varyings)0;
+
+                UNITY_SETUP_INSTANCE_ID(input);
+                UNITY_TRANSFER_INSTANCE_ID(input, output);
 
                 output.positionHCS =
                     TransformObjectToHClip(input.positionOS.xyz);
 
                 output.uv = TRANSFORM_TEX(input.uv, _BaseMap);
 
-                // Wysoko?? wierzcho?ka wzgl?dem zakresu modelu.
                 float heightRange = max(_ModelTop - _ModelBottom, 0.0001);
+
                 output.localHeight =
                     (input.positionOS.y - _ModelBottom) / heightRange;
 
@@ -96,6 +104,8 @@ Shader "MagicznyLas/Texture With Bloom"
 
             half4 Frag(Varyings input) : SV_Target
             {
+                UNITY_SETUP_INSTANCE_ID(input);
+
                 half4 baseSample =
                     SAMPLE_TEXTURE2D(
                         _BaseMap,
@@ -105,7 +115,6 @@ Shader "MagicznyLas/Texture With Bloom"
 
                 clip(baseSample.a - _AlphaClip);
 
-                // Maska w zakresie 0–1, niezale?na od skali obiektu.
                 half mask = smoothstep(
                     _MaskHeight - _MaskFeather,
                     _MaskHeight + _MaskFeather,

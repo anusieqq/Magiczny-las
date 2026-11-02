@@ -3,20 +3,60 @@
   "WorkspaceRootPath": "C:\\Users\\annaz\\MagicznyLas_shadery\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{F4070050-EEEE-EDED-5A13-9A7323FC1267}|Assembly-CSharp.csproj|c:\\users\\annaz\\magicznylas_shadery\\assets\\scripts\\playercontroler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{F4070050-EEEE-EDED-5A13-9A7323FC1267}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\playercontroler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{F4070050-EEEE-EDED-5A13-9A7323FC1267}|Assembly-CSharp.csproj|c:\\users\\annaz\\magicznylas_shadery\\assets\\shaders\\proceduralsparks.shader||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{F4070050-EEEE-EDED-5A13-9A7323FC1267}|Assembly-CSharp.csproj|solutionrelative:assets\\shaders\\proceduralsparks.shader||{3B902123-F8A7-4915-9F01-361F908088D0}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{F4070050-EEEE-EDED-5A13-9A7323FC1267}|Assembly-CSharp.csproj|C:\\Users\\annaz\\MagicznyLas_shadery\\assets\\shaders\\mgla.shader||{3B902123-F8A7-4915-9F01-361F908088D0}",
-      "RelativeMoniker": "D:0:0:{F4070050-EEEE-EDED-5A13-9A7323FC1267}|Assembly-CSharp.csproj|solutionrelative:assets\\shaders\\mgla.shader||{3B902123-F8A7-4915-9F01-361F908088D0}"
+      "AbsoluteMoniker": "D:0:0:{F4070050-EEEE-EDED-5A13-9A7323FC1267}|Assembly-CSharp.csproj|C:\\Users\\annaz\\MagicznyLas_shadery\\assets\\scripts\\proceduralsparks.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F4070050-EEEE-EDED-5A13-9A7323FC1267}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\proceduralsparks.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{F4070050-EEEE-EDED-5A13-9A7323FC1267}|Assembly-CSharp.csproj|C:\\Users\\annaz\\MagicznyLas_shadery\\assets\\scripts\\playerfog.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{F4070050-EEEE-EDED-5A13-9A7323FC1267}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\playerfog.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{F4070050-EEEE-EDED-5A13-9A7323FC1267}|Assembly-CSharp.csproj|C:\\Users\\annaz\\MagicznyLas_shadery\\assets\\scripts\\grass.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F4070050-EEEE-EDED-5A13-9A7323FC1267}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\grass.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F4070050-EEEE-EDED-5A13-9A7323FC1267}|Assembly-CSharp.csproj|C:\\Users\\annaz\\MagicznyLas_shadery\\assets\\scripts\\floatcrystal.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F4070050-EEEE-EDED-5A13-9A7323FC1267}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\floatcrystal.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{F4070050-EEEE-EDED-5A13-9A7323FC1267}|Assembly-CSharp.csproj|C:\\Users\\annaz\\MagicznyLas_shadery\\assets\\shaders\\krysztal.shader||{3B902123-F8A7-4915-9F01-361F908088D0}",
       "RelativeMoniker": "D:0:0:{F4070050-EEEE-EDED-5A13-9A7323FC1267}|Assembly-CSharp.csproj|solutionrelative:assets\\shaders\\krysztal.shader||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F4070050-EEEE-EDED-5A13-9A7323FC1267}|Assembly-CSharp.csproj|C:\\Users\\annaz\\MagicznyLas_shadery\\assets\\shaders\\grzyby.shader||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{F4070050-EEEE-EDED-5A13-9A7323FC1267}|Assembly-CSharp.csproj|solutionrelative:assets\\shaders\\grzyby.shader||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\annaz\\MagicznyLas_shadery\\Library\\PackageCache\\com.unity.render-pipelines.universal@0c5162adfb45\\Shaders\\Terrain\\TerrainLit.shader||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Library\\PackageCache\\com.unity.render-pipelines.universal@0c5162adfb45\\Shaders\\Terrain\\TerrainLit.shader||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|c:\\users\\annaz\\magicznylas_shadery\\assets\\shaders\\firefly.shader||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:assets\\shaders\\firefly.shader||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F4070050-EEEE-EDED-5A13-9A7323FC1267}|Assembly-CSharp.csproj|C:\\Users\\annaz\\MagicznyLas_shadery\\assets\\scripts\\playercontroler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F4070050-EEEE-EDED-5A13-9A7323FC1267}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\playercontroler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\annaz\\MagicznyLas_shadery\\assets\\shaders\\groundmist.shader||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:assets\\shaders\\groundmist.shader||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\annaz\\MagicznyLas_shadery\\assets\\shaders\\tree.shader||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:assets\\shaders\\tree.shader||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\annaz\\MagicznyLas_shadery\\assets\\scripts\\groundmistcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:assets\\scripts\\groundmistcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\annaz\\MagicznyLas_shadery\\assets\\scripts\\magictreeactivation.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:assets\\scripts\\magictreeactivation.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\annaz\\MagicznyLas_shadery\\assets\\scripts\\magictreespiral.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:assets\\scripts\\magictreespiral.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -26,7 +66,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": 7,
           "Children": [
             {
               "$type": "Bookmark",
@@ -42,7 +82,164 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "ProceduralSparks.cs",
+              "DocumentMoniker": "C:\\Users\\annaz\\MagicznyLas_shadery\\Assets\\Scripts\\ProceduralSparks.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\ProceduralSparks.cs",
+              "ToolTip": "C:\\Users\\annaz\\MagicznyLas_shadery\\Assets\\Scripts\\ProceduralSparks.cs",
+              "RelativeToolTip": "Assets\\Scripts\\ProceduralSparks.cs",
+              "ViewState": "AQIAAL0AAAAAAAAAAAAIwNkAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-02T14:11:28.281Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "MagicTreeSpiral.cs",
+              "DocumentMoniker": "C:\\Users\\annaz\\MagicznyLas_shadery\\Assets\\Scripts\\MagicTreeSpiral.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\MagicTreeSpiral.cs",
+              "ToolTip": "C:\\Users\\annaz\\MagicznyLas_shadery\\Assets\\Scripts\\MagicTreeSpiral.cs",
+              "RelativeToolTip": "Assets\\Scripts\\MagicTreeSpiral.cs",
+              "ViewState": "AQIAAGIBAAAAAAAAAAAIwH4BAAABAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-25T21:41:12.533Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Grass.cs",
+              "DocumentMoniker": "C:\\Users\\annaz\\MagicznyLas_shadery\\Assets\\Scripts\\Grass.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\Grass.cs",
+              "ToolTip": "C:\\Users\\annaz\\MagicznyLas_shadery\\Assets\\Scripts\\Grass.cs",
+              "RelativeToolTip": "Assets\\Scripts\\Grass.cs",
+              "ViewState": "AQIAAAIBAAAAAAAAAADwvx0BAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-31T20:31:41.784Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "Tree.shader",
+              "DocumentMoniker": "C:\\Users\\annaz\\MagicznyLas_shadery\\Assets\\Shaders\\Tree.shader",
+              "RelativeDocumentMoniker": "Assets\\Shaders\\Tree.shader",
+              "ToolTip": "C:\\Users\\annaz\\MagicznyLas_shadery\\Assets\\Shaders\\Tree.shader",
+              "RelativeToolTip": "Assets\\Shaders\\Tree.shader",
+              "ViewState": "AQIAAHsAAAAAAAAAAAAuwJoAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002777|",
+              "WhenOpened": "2026-10-25T21:10:02.834Z"
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "ProceduralSparks.shader",
+              "DocumentMoniker": "C:\\Users\\annaz\\MagicznyLas_shadery\\Assets\\Shaders\\ProceduralSparks.shader",
+              "RelativeDocumentMoniker": "Assets\\Shaders\\ProceduralSparks.shader",
+              "ToolTip": "C:\\Users\\annaz\\MagicznyLas_shadery\\Assets\\Shaders\\ProceduralSparks.shader",
+              "RelativeToolTip": "Assets\\Shaders\\ProceduralSparks.shader",
+              "ViewState": "AQIAADcAAAAAAAAAAAAuwFYAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002777|",
+              "WhenOpened": "2026-11-02T14:12:45.198Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "FloatCrystal.cs",
+              "DocumentMoniker": "C:\\Users\\annaz\\MagicznyLas_shadery\\Assets\\Scripts\\FloatCrystal.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\FloatCrystal.cs",
+              "ToolTip": "C:\\Users\\annaz\\MagicznyLas_shadery\\Assets\\Scripts\\FloatCrystal.cs",
+              "RelativeToolTip": "Assets\\Scripts\\FloatCrystal.cs",
+              "ViewState": "AQIAAA4AAAAAAAAAAAAAACkAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-02T14:10:47.68Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "GroundMist.shader",
+              "DocumentMoniker": "C:\\Users\\annaz\\MagicznyLas_shadery\\Assets\\Shaders\\GroundMist.shader",
+              "RelativeDocumentMoniker": "Assets\\Shaders\\GroundMist.shader",
+              "ToolTip": "C:\\Users\\annaz\\MagicznyLas_shadery\\Assets\\Shaders\\GroundMist.shader",
+              "RelativeToolTip": "Assets\\Shaders\\GroundMist.shader",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABIAAAABAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002777|",
+              "WhenOpened": "2026-10-31T17:07:12.644Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Grzyby.shader",
+              "DocumentMoniker": "C:\\Users\\annaz\\MagicznyLas_shadery\\Assets\\Shaders\\Grzyby.shader",
+              "RelativeDocumentMoniker": "Assets\\Shaders\\Grzyby.shader",
+              "ToolTip": "C:\\Users\\annaz\\MagicznyLas_shadery\\Assets\\Shaders\\Grzyby.shader",
+              "RelativeToolTip": "Assets\\Shaders\\Grzyby.shader",
+              "ViewState": "AQIAAHIAAAAAAAAAAAAuwJEAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002777|",
+              "WhenOpened": "2026-10-31T14:06:56.889Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "GroundMistController.cs",
+              "DocumentMoniker": "C:\\Users\\annaz\\MagicznyLas_shadery\\Assets\\Scripts\\GroundMistController.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\GroundMistController.cs",
+              "ToolTip": "C:\\Users\\annaz\\MagicznyLas_shadery\\Assets\\Scripts\\GroundMistController.cs",
+              "RelativeToolTip": "Assets\\Scripts\\GroundMistController.cs",
+              "ViewState": "AQIAABsAAAAAAAAAAAAUwDgAAAABAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-31T17:08:37.6Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Krysztal.shader",
+              "DocumentMoniker": "C:\\Users\\annaz\\MagicznyLas_shadery\\Assets\\Shaders\\Krysztal.shader",
+              "RelativeDocumentMoniker": "Assets\\Shaders\\Krysztal.shader",
+              "ToolTip": "C:\\Users\\annaz\\MagicznyLas_shadery\\Assets\\Shaders\\Krysztal.shader",
+              "RelativeToolTip": "Assets\\Shaders\\Krysztal.shader",
+              "ViewState": "AQIAAFIAAAAAAAAAAAAuwHEAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002777|",
+              "WhenOpened": "2026-10-19T16:49:33.27Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "TerrainLit.shader",
+              "DocumentMoniker": "C:\\Users\\annaz\\MagicznyLas_shadery\\Library\\PackageCache\\com.unity.render-pipelines.universal@0c5162adfb45\\Shaders\\Terrain\\TerrainLit.shader",
+              "RelativeDocumentMoniker": "Library\\PackageCache\\com.unity.render-pipelines.universal@0c5162adfb45\\Shaders\\Terrain\\TerrainLit.shader",
+              "ToolTip": "C:\\Users\\annaz\\MagicznyLas_shadery\\Library\\PackageCache\\com.unity.render-pipelines.universal@0c5162adfb45\\Shaders\\Terrain\\TerrainLit.shader",
+              "RelativeToolTip": "Library\\PackageCache\\com.unity.render-pipelines.universal@0c5162adfb45\\Shaders\\Terrain\\TerrainLit.shader",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002777|",
+              "WhenOpened": "2026-10-31T21:29:33.624Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "firefly.shader",
+              "DocumentMoniker": "C:\\Users\\annaz\\MagicznyLas_shadery\\Assets\\Shaders\\firefly.shader",
+              "RelativeDocumentMoniker": "Assets\\Shaders\\firefly.shader",
+              "ToolTip": "C:\\Users\\annaz\\MagicznyLas_shadery\\Assets\\Shaders\\firefly.shader",
+              "RelativeToolTip": "Assets\\Shaders\\firefly.shader",
+              "ViewState": "AQIAAF8BAAAAAAAAAAAqwH4BAAABAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002777|",
+              "WhenOpened": "2026-10-25T21:55:37.37Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "MagicTreeActivation.cs",
+              "DocumentMoniker": "C:\\Users\\annaz\\MagicznyLas_shadery\\Assets\\Scripts\\MagicTreeActivation.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\MagicTreeActivation.cs",
+              "ToolTip": "C:\\Users\\annaz\\MagicznyLas_shadery\\Assets\\Scripts\\MagicTreeActivation.cs",
+              "RelativeToolTip": "Assets\\Scripts\\MagicTreeActivation.cs",
+              "ViewState": "AQIAAB8AAAAAAAAAAAAQwFsAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-25T21:11:43.172Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
               "Title": "PlayerControler.cs",
               "DocumentMoniker": "C:\\Users\\annaz\\MagicznyLas_shadery\\Assets\\Scripts\\PlayerControler.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\PlayerControler.cs",
@@ -50,44 +247,7 @@
               "RelativeToolTip": "Assets\\Scripts\\PlayerControler.cs",
               "ViewState": "AQIAAHQAAAAAAAAAAAAIwJEAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-19T17:14:50.798Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "PlayerFog.cs",
-              "DocumentMoniker": "C:\\Users\\annaz\\MagicznyLas_shadery\\Assets\\Scripts\\PlayerFog.cs",
-              "RelativeDocumentMoniker": "Assets\\Scripts\\PlayerFog.cs",
-              "ToolTip": "C:\\Users\\annaz\\MagicznyLas_shadery\\Assets\\Scripts\\PlayerFog.cs",
-              "RelativeToolTip": "Assets\\Scripts\\PlayerFog.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAACQAAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-19T17:11:20.422Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "Mgla.shader",
-              "DocumentMoniker": "C:\\Users\\annaz\\MagicznyLas_shadery\\Assets\\Shaders\\Mgla.shader",
-              "RelativeDocumentMoniker": "Assets\\Shaders\\Mgla.shader",
-              "ToolTip": "C:\\Users\\annaz\\MagicznyLas_shadery\\Assets\\Shaders\\Mgla.shader",
-              "RelativeToolTip": "Assets\\Shaders\\Mgla.shader",
-              "ViewState": "AQIAABQBAAAAAAAAAAAqwDMBAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002777|",
-              "WhenOpened": "2026-10-19T16:53:20.549Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "Krysztal.shader",
-              "DocumentMoniker": "C:\\Users\\annaz\\MagicznyLas_shadery\\Assets\\Shaders\\Krysztal.shader",
-              "RelativeDocumentMoniker": "Assets\\Shaders\\Krysztal.shader",
-              "ToolTip": "C:\\Users\\annaz\\MagicznyLas_shadery\\Assets\\Shaders\\Krysztal.shader",
-              "RelativeToolTip": "Assets\\Shaders\\Krysztal.shader",
-              "ViewState": "AQIAAFIAAAAAAAAAAAAswHEAAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002777|",
-              "WhenOpened": "2026-10-19T16:49:33.27Z"
+              "WhenOpened": "2026-10-19T17:14:50.798Z"
             }
           ]
         }

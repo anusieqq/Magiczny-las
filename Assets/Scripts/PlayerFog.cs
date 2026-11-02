@@ -24,11 +24,18 @@ public class FogPlayerExclusion : MonoBehaviour
         if (player == null || fogRenderer == null)
             return;
 
+        Vector3 playerPosition = player.position;
+
         fogRenderer.GetPropertyBlock(properties);
 
         properties.SetVector(
             PlayerPositionID,
-            player.position
+            new Vector4(
+                playerPosition.x,
+                playerPosition.y,
+                playerPosition.z,
+                1f
+            )
         );
 
         fogRenderer.SetPropertyBlock(properties);
