@@ -225,44 +225,6 @@ Generator uruchamia się z menu kontekstowego lub przycisku edytora, a nie autom
 
 ---
 
-## MagicTreeActivation.cs
-**Plik:** `Assets/Scripts/Flora/MagicTreeActivation.cs`
-
-### 1. Jaki efekt to daje?
-Skrypt przygotowuje animację fali po zbliżeniu gracza do drzewa. Jednak shader liści nie odczytuje wartości fali, więc jej widoczny efekt nie jest potwierdzony.
-
-### 2. Jak to jest zrobione?
-```csharp
-if (!active && distance <= activationDistance)
-{
-    active = true;
-    waveHeight = transform.position.y;
-    glowTimer = glowDuration;
-}
-waveHeight += waveSpeed * Time.deltaTime;
-glowTimer -= Time.deltaTime;
-block.SetFloat(WaveHeightID, waveHeight);
-block.SetFloat(ActivationID, activation);
-treeRenderer.SetPropertyBlock(block);
-```
-Skrypt mierzy odległość gracza. Po wejściu w zasięg rozpoczyna od wysokości podstawy drzewa. W każdej klatce przesuwa wartość wysokości w górę i zmniejsza siłę blasku. Przekazuje obie wartości rendererom drzewa. Po przekroczeniu zadanej wysokości wyłącza animację i zeruje siłę. Ten skrypt nie aktywuje pnączy — ich aktywację obsługuje osobny `MagicTreeVines`.
-
-To działanie istnieje w skrypcie, ale w `TreeSpirals.shader` nie ma obliczeń używających wysokości ani siły fali. Samo wysyłanie wartości nie tworzy efektu, jeśli shader ich nie odczytuje.
-
-### 3. Jakie wartości można zmieniać?
-- `player` — obiekt gracza.
-- `treeRenderers` — renderery drzewa; jeśli lista jest pusta, skrypt pobiera renderery dzieci.
-- `activationDistance = 4` — zasięg uruchomienia, minimum 0.1.
-- `waveSpeed = 3` — szybkość przesuwania wartości wysokości, minimum 0.1.
-- `treeHeight = 6` — wysokość, przy której skrypt kończy animację, minimum 0.1.
-- `glowDuration = 2` — czas wygaszania, minimum 0.
-- Stałe zabezpieczające: dzielnik czasu nie może spaść poniżej 0.01, siła ograniczana jest do 0–1, a po zakończeniu wysokość ustawiana jest na -100.
-
-### 4. Dodatkowe informacje
-Wartości przekazywane są przez `MaterialPropertyBlock`, osobno dla każdego renderera i bez tworzenia kopii materiału. Materiały drzewa mają wpisy tych parametrów, ale shader ich nie używa.
-
----
-
 ## MagicTreeVines.cs
 **Plik:** `Assets/Scripts/Flora/MagicTreeVines.cs`
 
@@ -671,7 +633,7 @@ float centerVein = 1.0 - smoothstep(
 ```
 Shader nie pobiera tekstury wzoru liścia. Na podstawie położenia na powierzchni oblicza kilka fal, które tworzą nieregularne plamy. Wynik miesza ciemny, jasny i bazowy kolor. Odległość od środka współrzędnych liścia tworzy główną żyłkę; dodatkowe falowanie i maski tworzą żyłki boczne. Ich kolor nakładany jest na powierzchnię.
 
-Następnie shader przelicza normalną liścia i porównuje ją z kierunkiem głównego światła, dodaje światło otoczenia oraz skupione odbicie. Liście są nieprzezroczyste i renderowane z obu stron. Skrypt `MagicTreeActivation` wysyła temu rendererowi wartości opisujące falę, lecz shader nie deklaruje ani nie odczytuje tych wartości. Widoczna fala nie jest więc potwierdzona przez implementację tego shadera.
+Następnie shader przelicza normalną liścia i porównuje ją z kierunkiem głównego światła, dodaje światło otoczenia oraz skupione odbicie. Liście są nieprzezroczyste i renderowane z obu stron. Shader nie zawiera efektu fali świetlnej.
 
 ### 3. Jakie wartości można zmieniać?
 - `_BaseColor` — `(0.10, 0.16, 0.045, 1)`. Podstawowy kolor liścia.
@@ -719,7 +681,7 @@ Poniższa ocena wskazuje, które elementy projektu pasują do podanych kryterió
 
 **Drugi przykład:** **promienie zależne od kamery i światła**. Kontroler wylicza ekranowe położenie światła kierunkowego, wygładza jasność i wyłącza ją, gdy światło jest za kamerą. W `Scene1` znaleziono ten kontroler.
 
-**Ograniczenie do uczciwego wyjaśnienia:** skrypt aktywacji drzewa wysyła dane o fali, ale shader liści ich nie odczytuje. Nie należy przedstawiać tego jako działającego połączenia efektu.
+**Połączenie efektów:** pnącza aktywują się na podstawie odległości gracza w skrypcie `MagicTreeVines`. Shader liści odpowiada za ich kolor i żyłki; nie steruje aktywacją pnączy.
 
 **Ocena kryterium:** projekt ma konkretne przykłady reakcji na pozycję gracza oraz układ światła i kamery. Efekty współdziałają z elementami sceny, choć nie wszystkie tworzą jeden wspólny system.
 
@@ -742,5 +704,6 @@ Kształt dymu powstaje z kilku warstw szumu o różnej skali. Shader odkształca
 
 ## Krótka rekomendacja do prezentacji
 
-Najlepiej zbudować prezentację wokół trzech łatwych do pokazania przykładów: kryształu z Fresnelem jako efektu materiałowego, iskier jako efektu dynamicznego oraz GroundFog jako zaawansowanego efektu reagującego na gracza. Pokazują one kolejne poziomy trudności i mają konkretne potwierdzenie w kodzie projektu. Nie opieraj argumentacji na fali świetlnej z `MagicTreeActivation`, bo shader liści jej nie obsługuje. Pnącza można natomiast pokazać jako osobny efekt aktywowany przez zbliżenie gracza.
+Najlepiej zbudować prezentację wokół trzech łatwych do pokazania przykładów: kryształu z Fresnelem jako efektu materiałowego, iskier jako efektu dynamicznego oraz GroundFog jako zaawansowanego efektu reagującego na gracza. Pokazują one kolejne poziomy trudności i mają konkretne potwierdzenie w kodzie projektu. Pnącza można pokazać jako efekt aktywowany przez zbliżenie gracza: `MagicTreeVines` sprawdza odległość i rozpoczyna ich wzrost.
+
 
