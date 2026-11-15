@@ -61,35 +61,35 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.4.0f1\Editor\Data\Tools\BuildPipeline\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\TreeActivation.cs" />
-    <Compile Include="Assets\Scripts\FloatCrystal.cs" />
-    <Compile Include="Assets\Scripts\Grass.cs" />
-    <Compile Include="Assets\Scripts\PlayerFog.cs" />
-    <Compile Include="Assets\Scripts\PlayerControler.cs" />
-    <Compile Include="Assets\Scripts\CrystalSparks.cs" />
-    <Compile Include="Assets\Scripts\GodRaysController.cs" />
+    <Compile Include="Assets\Scripts\Flora\MagicTreeActivation.cs" />
+    <Compile Include="Assets\Scripts\Effects\Crystals\ProceduralCrystalSparks.cs" />
+    <Compile Include="Assets\Scripts\Effects\Crystals\MagicSpiral.cs" />
+    <Compile Include="Assets\Scripts\Effects\Crystals\CrystalFloat.cs" />
+    <Compile Include="Assets\Scripts\Environment\Fog\FogPlayerExclusion.cs" />
+    <Compile Include="Assets\Scripts\Flora\MagicalGrassGenerator.cs" />
+    <Compile Include="Assets\Scripts\Flora\MagicTreeVines.cs" />
+    <Compile Include="Assets\Scripts\Environment\Lighting\GodRaysController.cs" />
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
-    <Compile Include="Assets\Scripts\TreeSpiral.cs" />
-    <Compile Include="Assets\Scripts\ProceduralSparks.cs" />
+    <Compile Include="Assets\Scripts\Gameplay\Player\PlayerMovement.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\Shaders\ProceduralSparks.shader" />
+    <None Include="Assets\Shaders\Effects\ProceduralSparks.shader" />
     <None Include="Assets\TerrainSampleAssets\ThirdPartyNotices.txt" />
     <None Include="Assets\SineVFX\TranslucentCrystals\Resources\Shaders\SkyboxProceduralDesaturated.shader" />
-    <None Include="Assets\Shaders\Krysztal.shader" />
-    <None Include="Assets\Shaders\GodRays.shader" />
+    <None Include="Assets\Shaders\Effects\Krysztal.shader" />
+    <None Include="Assets\Shaders\Environment\GodRays.shader" />
     <None Include="Assets\SineVFX\TranslucentCrystals\Readme.txt" />
     <None Include="Assets\SineVFX\TranslucentCrystals\_SRP\!!!_ReadBeforeImport_!!!.txt" />
-    <None Include="Assets\Shaders\Grzyby.shader" />
+    <None Include="Assets\Shaders\Flora\Grzyby.shader" />
     <None Include="Assets\Trees Package Lite\ReadMe.txt" />
     <None Include="Assets\AdventureForge\Read me.txt" />
-    <None Include="Assets\Shaders\Fog.shader" />
-    <None Include="Assets\Shaders\Grass.shader" />
+    <None Include="Assets\Shaders\Environment\Fog.shader" />
+    <None Include="Assets\Shaders\Flora\Grass.shader" />
     <None Include="Assets\Game Buffs\Free Stylized Textures\README.txt" />
     <None Include="Assets\SineVFX\TranslucentCrystals\Resources\Shaders\Crystal.shader" />
-    <None Include="Assets\Shaders\TreeSpirals.shader" />
+    <None Include="Assets\Shaders\Flora\TreeSpirals.shader" />
     <None Include="Assets\SineVFX\TranslucentCrystals\_SRP\!!!_HDRP_Setup_!!!.txt" />
-    <None Include="Assets\Shaders\GroundFog.shader" />
+    <None Include="Assets\Shaders\Environment\GroundFog.shader" />
     <None Include="Assets\TerrainSampleAssets\ShaderGraphs\CustomFunctions\CustomLighting.hlsl" />
   </ItemGroup>
   <ItemGroup>
