@@ -10,20 +10,46 @@ Uwzględniono wszystkie pliki C# w folderze Assets i osiem własnych shaderów z
 Dodaje do panelu generatora trawy przyciski do jej tworzenia i usuwania. Nie wykonuje pracy samoczynnie.
 
 ### 2. Jak to jest zrobione?
+
+Ten plik zmienia wygląd okna Inspector dla `MagicalGrassGenerator`. Przygotowuje dwa przyciski, które uruchamiają metody generatora.
+
+#### W skrócie
+
+Wyświetla ustawienia generatora trawy i dodaje przyciski, które uruchamiają generowanie albo usuwanie trawy.
+
+#### Krok 1: pokazanie ustawień
+
 ```csharp
 DrawDefaultInspector();
+```
+
+Unity wyświetla standardowe pola komponentu, takie jak teren, gęstość i materiał. Dzięki temu własny edytor nadal pozwala zmieniać ustawienia generatora.
+
+#### Krok 2: pobranie edytowanego generatora
+
+```csharp
 MagicalGrassGenerator generator = (MagicalGrassGenerator)target;
+```
+
+`target` oznacza komponent, którego Inspector jest właśnie wyświetlany. Rzutowanie pozwala wywołać konkretne metody `MagicalGrassGenerator`.
+
+#### Krok 3: obsługa przycisków
+
+```csharp
 if (GUILayout.Button("Generate Magical Grass", GUILayout.Height(34f)))
     generator.GenerateGrass();
 if (GUILayout.Button("Clear Generated Grass", GUILayout.Height(30f)))
     generator.ClearGrass();
 ```
-Unity rysuje zwykłe ustawienia komponentu, a potem dwa przyciski. Kliknięcie przycisku wywołuje odpowiednią metodę generatora.
+
+Pierwszy przycisk uruchamia generowanie trawy, a drugi usuwa wygenerowane fragmenty. Sam edytor nie tworzy geometrii — robi to `MagicalGrassGenerator`.
 
 ### 3. Jakie wartości można zmieniać?
 Wysokości przycisków wpisane w kodzie to 34 i 30. Zmieniają tylko wygląd panelu. Parametry trawy znajdują się w komponencie `MagicalGrassGenerator`.
 
 ### 4. Dodatkowe informacje
+**Rodzaj zastosowanej techniki:** Narzędzie edytora Unity; samo nie tworzy efektu wizualnego.
+
 To narzędzie edytora, nie skrypt rozgrywki.
 
 ---
@@ -35,15 +61,36 @@ To narzędzie edytora, nie skrypt rozgrywki.
 Kryształ unosi się i opada, a opcjonalnie obraca się wokół własnej osi.
 
 ### 2. Jak to jest zrobione?
+
+Skrypt zapamiętuje początkowe położenie kryształu, a potem w każdej klatce oblicza jego wysokość na podstawie fali sinusoidalnej. Opcjonalnie obraca go wokół własnej osi Y.
+
+#### W skrócie
+
+Zapamiętuje pozycję kryształu, unosi go sinusoidalnie wokół tego miejsca i opcjonalnie obraca.
+
+#### Krok 1: przygotowanie animacji
+
+W `Start()` skrypt zapisuje `transform.localPosition` jako `startPosition`. To punkt odniesienia: kryształ będzie unosił się względem niego, zamiast stopniowo oddalać się od miejsca startowego. `Random.Range(0f, Mathf.PI * 2f)` losuje `randomOffset`, więc kryształy mogą być w różnych fazach ruchu.
+
+#### Krok 2: obliczenie unoszenia
+
 ```csharp
-startPosition = transform.localPosition;
-randomOffset = Random.Range(0f, Mathf.PI * 2f);
-float offsetY = Mathf.Sin(Time.time * frequency * 2f * Mathf.PI + randomOffset) * amplitude;
+float offsetY = Mathf.Sin(
+    Time.time * frequency * 2f * Mathf.PI + randomOffset
+) * amplitude;
 transform.localPosition = startPosition + Vector3.up * offsetY;
+```
+
+`Time.time` sprawia, że fala zmienia się w czasie. `frequency` określa tempo jej powtarzania, a `randomOffset` przesuwa kryształ do innego momentu cyklu. Sinus przyjmuje wartości od -1 do 1; pomnożenie przez `amplitude` ustala maksymalną odległość ruchu w górę i w dół. Wynik jest dodawany do zapamiętanej pozycji.
+
+#### Krok 3: opcjonalny obrót
+
+```csharp
 if (rotate)
     transform.Rotate(Vector3.up, rotationSpeed * Time.deltaTime, Space.Self);
 ```
-Na początku skrypt zapamiętuje lokalne położenie i losuje punkt startowy cyklu. Potem sinus wylicza łagodne przesunięcie w pionie, a amplituda ogranicza jego wysokość. Obrót jest niezależny od unoszenia.
+
+Jeśli `rotate` jest włączone, kryształ obraca się wokół własnej lokalnej osi Y. `Time.deltaTime` sprawia, że obrót zależy od czasu, a nie od liczby klatek. Wyłączenie `rotate` zatrzymuje tylko obrót — unoszenie nadal działa.
 
 ### 3. Jakie wartości można zmieniać?
 - `amplitude = 0.2` — wysokość unoszenia; zwiększenie wzmacnia ruch.
@@ -53,6 +100,8 @@ Na początku skrypt zapamiętuje lokalne położenie i losuje punkt startowy cyk
 - `randomOffset` jest losowany od 0 do 2π przy starcie, aby kryształy nie poruszały się synchronicznie.
 
 ### 4. Dodatkowe informacje
+**Rodzaj zastosowanej techniki:** Proceduralna animacja Transformu oparta na sinusoidzie; efekt geometryczny, nie wolumetryczny.
+
 Skrypt zmienia Transform obiektu i nie steruje shaderem.
 
 ---
@@ -64,19 +113,99 @@ Skrypt zmienia Transform obiektu i nie steruje shaderem.
 Tworzy spiralę kulek wokół obiektu. Kulki obracają się, wznoszą, zawijają z powrotem na dół i pulsują. Mogą pojawiać się po zbliżeniu gracza.
 
 ### 2. Jak to jest zrobione?
+
+Najprościej: skrypt sam tworzy wiele małych kulek, ustawia je wokół drzewa lub innego obiektu i przesuwa je w każdej klatce. Każda kulka dostaje inne początkowe położenie na okręgu, dlatego razem wyglądają jak wirująca spirala. Gdy gracz odejdzie od obiektu, kulki są ukrywane.
+
+#### W skrócie
+
+Tworzy kulki, rozkłada je po okręgu i w każdej klatce przesuwa po spirali, pulsując ich rozmiarem; może pokazywać je po zbliżeniu gracza.
+
+#### Krok 1: przygotowanie kulek
+
+W metodzie `Start()` skrypt najpierw sprawdza, czy w Inspectorze przypisano `particleMaterial`. Bez materiału kulek nie da się poprawnie wyświetlić, więc skrypt wypisuje błąd i wyłącza siebie:
+
+```csharp
+if (particleMaterial == null)
+{
+    Debug.LogError("MagicSpiral: assign a material to Particle Material.", this);
+    enabled = false;
+    return;
+}
+```
+
+Następnie tworzy pusty obiekt `Generated Magic Spiral` jako wspólnego rodzica kulek. Rodzic jest ustawiony w miejscu obiektu, na którym znajduje się `MagicSpiral`. Dzięki temu łatwiej zarządzać całą grupą i usunąć ją po zniszczeniu obiektu.
+
+Liczba kulek wynika z `particleCount`. Dla każdej z nich kod tworzy zwykłą sferę Unity:
+
 ```csharp
 GameObject particle = GameObject.CreatePrimitive(PrimitiveType.Sphere);
 particle.transform.SetParent(particleRoot, false);
-Destroy(particle.GetComponent<Collider>());
+```
+
+Sfera utworzona przez `CreatePrimitive` ma collider, ale tutaj kulki są tylko ozdobą. Dlatego skrypt usuwa collider. Potem przypisuje im wspólny materiał `particleMaterial` i wyłącza rzucanie oraz odbieranie cieni. Każda kulka zostaje zapisana w tablicy `particles`, aby można było później przesuwać ją i zmieniać jej rozmiar.
+
+#### Krok 2: rozłożenie kulek wokół okręgu
+
+Przy tworzeniu każdej kulki skrypt zapisuje jej własne przesunięcie:
+
+```csharp
 offsets[i] = (float)i / particleCount;
-float progress = Mathf.Repeat(offsets[i] + Time.time * upwardSpeed / height, 1f);
+```
+
+Wartości te rozkładają kulki równomiernie: pierwsza zaczyna od jednego miejsca okręgu, następne od kolejnych. Dzięki temu wszystkie kulki nie nakładają się na siebie na starcie.
+
+#### Krok 3: sprawdzenie, czy efekt ma być widoczny
+
+W każdej klatce metoda `Update()` sprawdza ustawienia aktywacji. Jeśli `alwaysActive` jest włączone, efekt ma być aktywny bez względu na odległość. Jeśli przypisano `player`, skrypt mierzy odległość między graczem a obiektem z tym skryptem:
+
+```csharp
+float distance = Vector3.Distance(player.position, transform.position);
+shouldBeActive |= distance <= activationDistance;
+```
+
+`Vector3.Distance` oblicza odległość między dwoma punktami w scenie. Gdy gracz znajdzie się w zasięgu `activationDistance`, kulki zostają włączone. Po odejściu poza ten zasięg skrypt je ukrywa. Widoczność jest zmieniana tylko wtedy, gdy stan aktywności rzeczywiście się zmienił. Jeśli `player` nie jest przypisany, a `alwaysActive` jest wyłączone, metoda kończy działanie i efekt pozostaje nieaktywny.
+
+#### Krok 4: ruch tworzący spiralę
+
+Gdy efekt jest aktywny, `Update()` przechodzi po wszystkich kulkach i oblicza ich nowe położenie. Wysokość każdej kulki wyznacza `progress`:
+
+```csharp
+float progress = Mathf.Repeat(
+    offsets[i] + Time.time * upwardSpeed / height,
+    1f
+);
+float y = progress * height;
+```
+
+`Time.time` oznacza czas od uruchomienia gry. Dodając go do `offsets[i]`, skrypt sprawia, że kulki stale przesuwają się do góry. `upwardSpeed` określa tempo tego ruchu, a `height` — wysokość całej spirali. `Mathf.Repeat(..., 1f)` zawija wynik z powrotem do zakresu od 0 do 1. Gdy kulka dojdzie na górę, jej położenie zaczyna się więc ponownie przy dole, zamiast zatrzymywać się.
+
+Położenie wokół osi obiektu obliczają sinus i cosinus:
+
+```csharp
 float angle = offsets[i] * Mathf.PI * 2f + Time.time * rotationSpeed;
 float x = Mathf.Cos(angle) * radius;
 float z = Mathf.Sin(angle) * radius;
-float y = progress * height;
+particles[i].localPosition = new Vector3(x, y, z);
 ```
-Skrypt tworzy sfery, usuwa collider, bo kulki są dekoracją, i rozsuwa je początkowo równomiernie. Sinus i cosinus wyznaczają okrąg, a powtarzany postęp wyznacza wysokość i powoduje cykliczny powrót na dół. Osobny sinus zmienia skalę, tworząc puls. Sprawdzanie odległości włącza lub ukrywa całą grupę.
 
+Sinus i cosinus wyznaczają punkt na okręgu. `radius` ustala, jak daleko od środka znajdują się kulki. Czas oraz `rotationSpeed` stale zmieniają kąt, więc punkt przesuwa się wokół obiektu. Jednocześnie `y` rośnie i zawija się od góry do dołu. Połączenie ruchu dookoła i ruchu w górę tworzy spiralny tor.
+
+Pozycja jest zapisywana jako `localPosition`, czyli względem obiektu nadrzędnego `particleRoot`, a nie jako pozycja niezależna od obiektu. W praktyce spirala porusza się razem z obiektem, do którego przypisano skrypt.
+
+#### Krok 5: pulsowanie kulek
+
+Rozmiar każdej kulki jest lekko zmieniany w czasie:
+
+```csharp
+float pulse = 0.75f + 0.25f * Mathf.Sin(Time.time * 4f + i);
+particles[i].localScale = Vector3.one * particleSize * pulse;
+```
+
+`Mathf.Sin` daje powtarzającą się falę. Dodanie `i` powoduje, że kulki pulsują w różnych momentach, zamiast wszystkie równocześnie. Wynik `pulse` mieści się w przybliżeniu między 0.5 a 1, więc kulka zmniejsza się i wraca do swojego rozmiaru bazowego `particleSize`. Wartość `4f` ustala tempo pulsowania i jest wpisana bezpośrednio w kodzie.
+
+#### Sprzątanie po efekcie
+
+`SetParticlesVisible()` włącza lub wyłącza każdą utworzoną kulkę. `OnDestroy()` usuwa obiekt `particleRoot`, a wraz z nim całą wygenerowaną grupę.
 ### 3. Jakie wartości można zmieniać?
 - `player` — obiekt, którego odległość aktywuje efekt.
 - `particleMaterial` — materiał kulek; wymagany.
@@ -91,6 +220,8 @@ Skrypt tworzy sfery, usuwa collider, bo kulki są dekoracją, i rozsuwa je pocz�
 - Puls ma stały zakres skali 0.5–1 wartości bazowej; nie ma osobnych ustawień.
 
 ### 4. Dodatkowe informacje
+**Rodzaj zastosowanej techniki:** Proceduralna animacja wielu obiektów sferycznych; geometria w ruchu, nie system cząsteczek ani efekt wolumetryczny.
+
 To osobne obiekty sferyczne, nie wbudowany system cząsteczek Unity. Po zniszczeniu skrypt usuwa utworzoną grupę.
 
 ---
@@ -102,17 +233,50 @@ To osobne obiekty sferyczne, nie wbudowany system cząsteczek Unity. Po zniszcze
 Iskry krążą wokół kryształu, unoszą się, lekko zbaczają z toru, pulsują oraz pojawiają się i znikają. Są płaskimi kształtami zwróconymi do kamery.
 
 ### 2. Jak to jest zrobione?
+
+Skrypt nie tworzy osobnego obiektu Unity dla każdej iskry. Buduje jedną siatkę z wielu małych czworokątów, a w każdej klatce zmienia ich położenie i przezroczystość.
+
+#### W skrócie
+
+Buduje jedną siatkę z czworokątów-iskier, porusza je wokół kryształu, kieruje ich powierzchnie do kamery i animuje ich widoczność.
+
+#### Krok 1: wybór kryształu i materiału
+
+W `Start()` skrypt korzysta z przypisanego `crystal`; jeśli pole jest puste, wybiera obiekt nadrzędny, a gdy go nie ma — własny obiekt. Pobiera `MeshFilter` i `MeshRenderer`. Materiał `sparkMaterial` przypisuje do renderera; brak materiału powoduje komunikat błędu.
+
+#### Krok 2: zbudowanie jednej siatki
+
 ```csharp
 vertices = new Vector3[count * 4];
 triangles = new int[count * 6];
-float wobbleX = Mathf.Sin(Time.time * wobbleSpeed + spark.phase) * wobbleAmount;
-float wobbleZ = Mathf.Cos(Time.time * wobbleSpeed * 0.8f + spark.phase) * wobbleAmount;
+```
+
+Każda iskra zajmuje cztery wierzchołki i dwa trójkąty, czyli sześć indeksów. Pętla w `CreateSparks()` wypełnia tablice wierzchołków, UV, kolorów i trójkątów. Dla każdej iskry tworzy też zestaw danych `Spark`: kąt, wysokość, wiek, czas życia, promień, rozmiar i wartości losowe sterujące jej ruchem. Na końcu dane trafiają do dynamicznej siatki przypisanej do `MeshFilter`.
+
+#### Krok 3: losowe rozpoczęcie iskier
+
+`ResetSpark()` losuje początkowy kąt i promień orbity, rozmiar, czas życia, fazę kołysania oraz mnożnik prędkości. Przy pierwszym uruchomieniu iskry dostają też losowy wiek i wysokość, żeby nie zaczynały wszystkie w tym samym miejscu. Po wygaśnięciu iskra jest ponownie inicjalizowana u dołu.
+
+#### Krok 4: ruch wokół kryształu
+
+W `LateUpdate()` każda iskra przesuwa się po kącie orbity i powoli wznosi. Gdy przekroczy górną granicę, wraca na dół. `Mathf.Sin` i `Mathf.Cos` dodają boczne wychylenia. Z kąta, promienia, wysokości i wychyleń powstaje lokalna pozycja, którą `crystal.TransformPoint()` przenosi do świata.
+
+Czworokąty są billboardami: ich boki wyznacza się z osi `right` i `up` aktywnej kamery. Dzięki temu są skierowane do kamery, zamiast znikać z widoku przy patrzeniu z boku. Gdy kamera nie jest dostępna, skrypt używa osi świata.
+
+#### Krok 5: pojawianie się, zanikanie i aktualizacja
+
+```csharp
 float normalizedAge = spark.age / spark.lifetime;
 float fadeIn = Mathf.Clamp01(normalizedAge * 5f);
 float fadeOut = Mathf.Clamp01((1f - normalizedAge) * 4f);
 float alpha = fadeIn * fadeOut * pulse;
 ```
-Każda iskra składa się z czterech wierzchołków i dwóch trójkątów. Wszystkie zapisane są w jednej siatce. Skrypt przechowuje kąt, wysokość, wiek, czas życia, promień, rozmiar, fazę i szybkość dla każdej iskry. Sinus i cosinus dodają kołysanie, a czas życia steruje narastaniem i zanikaniem przezroczystości. Każdą klatkę skrypt aktualizuje pozycje i kolory siatki.
+
+Wiek jest zamieniany na postęp od 0 do 1. `fadeIn` stopniowo zwiększa widoczność na początku, a `fadeOut` zmniejsza ją pod koniec życia. `pulse` dodaje zmianę jasności w czasie. Otrzymana wartość `alpha` jest zapisana w kolorze wszystkich czterech wierzchołków iskry. Na końcu `LateUpdate()` zaktualizowane wierzchołki i kolory są przekazywane do siatki, a jej granice są przeliczane.
+
+#### Krok 6: zwolnienie siatki
+
+`OnDestroy()` usuwa utworzoną siatkę, gdy znika obiekt ze skryptem.
 
 ### 3. Jakie wartości można zmieniać?
 - `crystal` — środek efektu; domyślnie używa rodzica albo własnego obiektu.
@@ -128,6 +292,8 @@ Każda iskra składa się z czterech wierzchołków i dwóch trójkątów. Wszys
 - Stałe kodu: 4 wierzchołki na iskrę, mnożniki zanikania 5 i 4 oraz puls zależny od czasu i fazy.
 
 ### 4. Dodatkowe informacje
+**Rodzaj zastosowanej techniki:** Proceduralny efekt cząsteczkowy realizowany przez dynamiczną siatkę billboardów; nie jest wolumetryczny.
+
 Kamera jest pobierana jako główna. Gdy jej nie ma, stosowane są osie świata. Siatka jest oznaczona jako często zmieniana i zwalniana przy niszczeniu obiektu.
 
 ---
@@ -139,20 +305,43 @@ Kamera jest pobierana jako główna. Gdy jej nie ma, stosowane są osie świata.
 Tworzy w dymie GroundFog rzadszą strefę wokół gracza. Strefa podąża za graczem.
 
 ### 2. Jak to jest zrobione?
+
+Ten skrypt sam nie rysuje mgły. Co klatkę przekazuje shaderowi aktualne położenie gracza, aby shader mógł osłabić mgłę w jego pobliżu.
+
+#### W skrócie
+
+Co klatkę przekazuje pozycję gracza do renderera, aby GroundFog mógł zmniejszyć gęstość mgły w pobliżu gracza.
+
+#### Krok 1: przygotowanie renderera
+
+W `Awake()` skrypt pobiera `Renderer` z tego samego obiektu i tworzy `MaterialPropertyBlock`. Ten blok pozwala przekazać ustawienie dla konkretnego renderera bez tworzenia osobnej kopii materiału. Atrybut `RequireComponent` wymaga, by obiekt miał `Renderer`.
+
+#### Krok 2: pobranie pozycji gracza
+
+W `LateUpdate()` skrypt kończy pracę, jeśli brakuje referencji do gracza albo renderera. W innym przypadku odczytuje `player.position`, czyli pozycję gracza w świecie.
+
+#### Krok 3: przekazanie pozycji do renderera
+
 ```csharp
-Vector3 playerPosition = player.position;
 fogRenderer.GetPropertyBlock(properties);
 properties.SetVector(PlayerPositionID,
     new Vector4(playerPosition.x, playerPosition.y, playerPosition.z, 1f));
 fogRenderer.SetPropertyBlock(properties);
 ```
-W każdej późnej aktualizacji skrypt pobiera pozycję gracza i przekazuje ją do renderera przez blok właściwości. GroundFog używa pozycji poziomej do obliczenia odległości każdej próbki dymu. Wewnątrz promienia ogranicza gęstość, a przy krawędzi stopniowo ją przywraca.
+
+Najpierw pobierany jest aktualny blok, aby zachować inne ustawienia renderera. Potem pozycja gracza trafia do wektora `_PlayerPosition`, a `SetPropertyBlock` przekazuje blok z powrotem rendererowi. Dzieje się to w każdej późnej aktualizacji, więc shader otrzymuje aktualną pozycję.
+
+#### Krok 4: wykorzystanie danych przez GroundFog
+
+`GroundFog.shader` odczytuje `_PlayerPosition` i porównuje położenie próbek mgły z pozycją gracza. Wokół gracza osłabia gęstość mgły, a dalej od niego przywraca ją stopniowo. Promień oraz miękkość przejścia wynikają z parametrów shadera, nie z tego skryptu.
 
 ### 3. Jakie wartości można zmieniać?
 - `player` — Transform gracza, wymagany do działania.
 - Skrypt nie ma własnego promienia. W materiale GroundFog wartości `_ExclusionRadius` i `_ExclusionFeather` określają rozmiar strefy i szerokość przejścia.
 
 ### 4. Dodatkowe informacje
+**Rodzaj zastosowanej techniki:** Skrypt interakcji sterujący maską w shaderze wolumetrycznego dymu; sam nie wykonuje renderowania wolumetrycznego.
+
 Wymaga renderera na tym samym obiekcie. W scenach `Scene1` i `SampleScene` renderer korzysta z `GroundFog_Mat`. Pozycja jest przekazywana do renderera bez tworzenia kopii materiału.
 
 ---
@@ -164,18 +353,42 @@ Wymaga renderera na tym samym obiekcie. W scenach `Scene1` i `SampleScene` rende
 Ustawia położenie źródła promieni na ekranie i płynnie reguluje ich intensywność. Światło za kamerą wyłącza efekt.
 
 ### 2. Jak to jest zrobione?
+
+Skrypt znajduje na ekranie kierunek, z którego pada światło kierunkowe, i przekazuje tę pozycję do materiału promieni. Równocześnie stopniowo zmienia intensywność efektu, aby nie skakała gwałtownie.
+
+#### W skrócie
+
+Oblicza ekranowe położenie światła i płynnie przekazuje shaderowi jego pozycję oraz aktualną intensywność promieni.
+
+#### Krok 1: sprawdzenie potrzebnych obiektów
+
+W `LateUpdate()` skrypt działa tylko wtedy, gdy przypisano kamerę `targetCamera`, światło `directionalLight` i materiał `godRaysMaterial`. Atrybut `[ExecuteAlways]` pozwala wykonywać aktualizację również poza trybem Play w edytorze.
+
+#### Krok 2: ustalenie położenia światła na ekranie
+
 ```csharp
 Vector3 lightDirection = -directionalLight.transform.forward;
 Vector3 lightPoint = targetCamera.transform.position + lightDirection * 1000f;
 Vector3 screenPosition = targetCamera.WorldToViewportPoint(lightPoint);
-float frontFactor = screenPosition.z > 0f ? 1f : 0f;
-float heightFactor = Mathf.InverseLerp(0.0f, 0.8f, y);
-heightFactor = Mathf.SmoothStep(0f, 1f, heightFactor);
-currentIntensity = Mathf.Lerp(currentIntensity, targetIntensity,
+```
+
+Światło kierunkowe nie ma jednego bliskiego punktu źródłowego, dlatego skrypt bierze przeciwny kierunek jego osi `forward` i tworzy umowny punkt daleko od kamery. `WorldToViewportPoint` przelicza go na współrzędne widoku: środek ma wartości około `(0.5, 0.5)`. Współrzędne X i Y są ograniczane do zakresu od `-1` do `2`, by pozycja mogła być poza ekranem bez nagłego skoku na jego krawędzi.
+
+#### Krok 3: wyliczenie docelowej intensywności
+
+`screenPosition.z` informuje, czy punkt jest przed kamerą. Jeśli jest za nią, `frontFactor` wynosi zero i efekt gaśnie. W przeciwnym razie wysokość ekranowa `y` jest przeliczana przez `Mathf.InverseLerp(0.0f, 0.8f, y)`, a następnie wygładzana przez `Mathf.SmoothStep`. Tak powstaje `heightFactor`, który wraz z `minimumIntensity` wyznacza `targetIntensity`.
+
+#### Krok 4: wygładzenie i przesłanie wartości
+
+```csharp
+currentIntensity = Mathf.Lerp(
+    currentIntensity,
+    targetIntensity,
     1f - Mathf.Exp(-speed * Time.deltaTime));
 godRaysMaterial.SetFloat(RayIntensity, currentIntensity);
 ```
-Kierunkowe światło nie ma jednego punktu w przestrzeni, dlatego skrypt tworzy punkt daleko w kierunku jego padania. Kamera przelicza go na położenie ekranowe. Wysokość tego miejsca wpływa na docelową intensywność, a światło za kamerą daje intensywność zerową. Funkcja wygładzająca stopniowo zbliża aktualną wartość do docelowej. Skrypt przekazuje pozycję i jasność materiałowi promieni.
+
+`Mathf.Lerp` zbliża bieżącą intensywność do docelowej, a wyrażenie z `Mathf.Exp` wylicza tempo tego zbliżania w sposób zależny od czasu klatki. `smoothSpeed` kontroluje szybkość zmiany. Skrypt przekazuje do materiału `_LightScreenPos` oraz `_RayIntensity`; shader używa pozycji jako kierunku promieni, a intensywności jako ich siły.
 
 ### 3. Jakie wartości można zmieniać?
 - `targetCamera`, `directionalLight`, `godRaysMaterial` — kamera, światło i materiał; wszystkie muszą być przypisane.
@@ -184,6 +397,8 @@ Kierunkowe światło nie ma jednego punktu w przestrzeni, dlatego skrypt tworzy 
 - W kodzie punkt jest odsunięty o 1000 jednostek; współrzędne ekranu ograniczane są do zakresu od -1 do 2. Wysokość mapowana jest w zakresie 0–0.8.
 
 ### 4. Dodatkowe informacje
+**Rodzaj zastosowanej techniki:** Kontroler efektu ekranowego zależnego od położenia światła; sam nie oblicza wolumetrycznego oświetlenia.
+
 `[ExecuteAlways]` uruchamia aktualizację także w edytorze. Brak którejkolwiek referencji pomija aktualizację. Shader GodRays dodatkowo ma własne ustawienia materiału.
 
 ---
@@ -195,18 +410,44 @@ Kierunkowe światło nie ma jednego punktu w przestrzeni, dlatego skrypt tworzy 
 Tworzy na terenie kępki trawy o zróżnicowanej wysokości, szerokości, kolorze i wygięciu.
 
 ### 2. Jak to jest zrobione?
+
+Generator tworzy trawę jako własną geometrię, a nie jako obiekty sadzone pojedynczo. Dzieli teren na mniejsze części, w każdej losuje źdźbła, buduje ich siatki i przypisuje im materiał.
+
+#### W skrócie
+
+Dzieli teren na fragmenty, losuje i buduje w nich źdźbła jako siatki, po czym przypisuje im materiał trawy.
+
+#### Krok 1: sprawdzenie ustawień i przygotowanie losowania
+
+`GenerateGrass()` sprawdza, czy przypisano teren z `TerrainData` oraz `grassMaterial`. Jeśli czegoś brakuje, wypisuje błąd i kończy działanie. Następnie ogranicza `density`, `chunkSize` i `bladeWidth` do minimalnych wartości, usuwa poprzednią trawę i tworzy generator pseudolosowy z `seed`. Ten sam seed pozwala odtworzyć podobny układ po ponownym wygenerowaniu.
+
+#### Krok 2: podział terenu na fragmenty
+
+Liczbę fragmentów w osiach X i Z wyznaczają `CeilToInt(size / chunkSize)`. Pętle wywołują `GenerateChunk()` dla każdego fragmentu. Ostatni fragment przy krawędzi jest przycinany do rozmiaru terenu.
+
+#### Krok 3: losowanie miejsc i dopasowanie do podłoża
+
+Liczba źdźbeł w fragmencie wynika z jego powierzchni pomnożonej przez `density`. Dla każdego źdźbła skrypt losuje X i Z, zamienia je na znormalizowane UV terenu i pobiera wysokość oraz normalną przez `GetInterpolatedHeight` i `GetInterpolatedNormal`. Dzięki temu źdźbło zaczyna się na powierzchni i uwzględnia jej nachylenie.
+
+Skrypt losuje też wysokość w przedziale `minHeight`–`maxHeight`, jej dodatkowe zróżnicowanie `heightRandomness`, szerokość z uwzględnieniem `widthRandomness` i obrót wokół normalnej podłoża. `Vector3.ProjectOnPlane` usuwa z kierunku składową prostopadłą do gruntu, żeby źdźbło miało właściwą orientację.
+
+#### Krok 4: zbudowanie źdźbła z dwóch płaszczyzn
+
 ```csharp
-int countX = Mathf.CeilToInt(size.x / chunkSize);
-int countZ = Mathf.CeilToInt(size.z / chunkSize);
-float y = data.GetInterpolatedHeight(u, v);
-Vector3 normal = data.GetInterpolatedNormal(u, v);
+AddBladePlane(..., direction, randomHeight, width, random);
 Vector3 secondDirection = Vector3.Cross(worldNormal, direction).normalized;
-AddBladePlane(vertices, uvs, colors, triangles,
-    worldPosition, worldNormal, direction, randomHeight, width, random);
-AddBladePlane(vertices, uvs, colors, triangles,
-    worldPosition, worldNormal, secondDirection, randomHeight, width, random);
+AddBladePlane(..., secondDirection, randomHeight, width, random);
 ```
-Po sprawdzeniu terenu i materiału generator dzieli teren na fragmenty. W każdym losuje pozycje źdźbeł, pobiera wysokość i nachylenie gruntu, a potem losuje rozmiar, obrót i kolor. Każde źdźbło składa się z dwóch płaszczyzn ustawionych na krzyż. Każda płaszczyzna ma trzy odcinki, zwęża się ku górze i jest lekko wygięta. Gotowe dane są zapisywane w siatce przypisanej do obiektu fragmentu.
+
+Pierwsza płaszczyzna ustawia się losowo, druga jest do niej prostopadła. Skrzyżowanie dwóch płaskich kształtów sprawia, że źdźbło jest widoczne z większej liczby kierunków. `AddBladePlane()` dzieli je na trzy segmenty, zwęża ku górze i odchyla według `curvature`. Zapisuje wierzchołki, UV, kolory i trójkąty do list.
+
+#### Krok 5: utworzenie siatki i obiektu sceny
+
+Po zebraniu danych generator tworzy `Mesh`, wpisuje do niego wierzchołki, UV, kolory i trójkąty, a następnie przelicza normalne i granice. Dla dużej liczby wierzchołków włącza indeksowanie 32-bitowe. Siatka dostaje obiekt z `MeshFilter` i `MeshRenderer`, któremu przypisywany jest `grassMaterial`. Każdy fragment jest osobnym obiektem podrzędnym generatora.
+
+#### Krok 6: usuwanie wygenerowanej trawy
+
+`ClearGrass()` przechodzi po dzieciach generatora i usuwa tylko obiekty, których nazwa zaczyna się od `MagicalGrass_`. Najpierw odłącza i usuwa ich siatki, a potem obiekty. W trybie Play używa `Destroy`, a w edytorze `DestroyImmediate`.
 
 ### 3. Jakie wartości można zmieniać?
 - `terrain` — teren docelowy.
@@ -221,6 +462,8 @@ Po sprawdzeniu terenu i materiału generator dzieli teren na fragmenty. W każdy
 - W kodzie: 3 segmenty na płaszczyznę; losowa zmienność koloru wierzchołków od 0.8 do 1.2; przy ponad 65535 wierzchołkach używany jest szerszy format indeksów.
 
 ### 4. Dodatkowe informacje
+**Rodzaj zastosowanej techniki:** Proceduralne generowanie geometrii na CPU; nie jest metodą wolumetryczną.
+
 Generator uruchamia się z menu kontekstowego lub przycisku edytora, a nie automatycznie w czasie gry. Czyszczenie usuwa wyłącznie dzieci o nazwie zaczynającej się od `MagicalGrass_`.
 
 ---
@@ -232,18 +475,42 @@ Generator uruchamia się z menu kontekstowego lub przycisku edytora, a nie autom
 Tworzy spiralne pnącza oplatające pień oraz świetliki krążące, unoszące się i pulsujące wokół drzewa.
 
 ### 2. Jak to jest zrobione?
-```csharp
-float angle = startAngle + t * turns * Mathf.PI * 2f;
-float variation = Mathf.Sin(t * 17f + phase1) * irregularity
-    + Mathf.Sin(t * 31f + phase2) * irregularity * 0.4f;
-float x = Mathf.Cos(angle) * r;
-float z = Mathf.Sin(angle) * r;
-float y = vineHeight * t
-    + Mathf.Sin(t * Mathf.PI * 2f + phase1) * 0.08f;
-```
-Punkty pnącza są obliczane raz na początku. Kąt i sinusy układają je w spiralę z nieregularnym promieniem i falującą wysokością. Potem LineRenderer pokazuje coraz dłuższy fragment tej ścieżki. Opóźnienie rozdziela w czasie wzrost kolejnych pnączy. Po dezaktywacji ich widoczna długość maleje.
 
-Świetliki są sferami bez colliderów. Dla każdej wyliczana jest orbita i wysokość, a sinusy dodają boczne kołysanie. Puls zmienia ich rozmiar. Skala zależy również od tego, jak bardzo urosły pnącza.
+Skrypt tworzy pnącza jako linie oplatające pień i świetliki jako małe sfery. Gdy efekt jest aktywny, pnącza stopniowo się wydłużają, a świetliki poruszają się wokół drzewa. Po wyłączeniu efektu pnącza się skracają.
+
+#### W skrócie
+
+Wyznacza spiralne trasy pnączy, odsłania je stopniowo przy aktywacji i animuje świetliki, których widoczność zależy od wzrostu pnączy.
+
+#### Krok 1: przygotowanie efektu
+
+W `Start()` wymagany jest `vineMaterial`. Jeśli go brakuje, skrypt zgłasza błąd i wyłącza się. Wartości takie jak `vineCount`, `pointsPerVine`, `fireflyCount` i `growthDuration` są ograniczane do bezpiecznych minimów. Potem wywoływane są `CreateVines()` i `CreateFireflies()`.
+
+#### Krok 2: utworzenie tras pnączy
+
+`CreateVines()` tworzy dla każdego pnącza osobny obiekt z `LineRenderer`. Renderer korzysta z lokalnych współrzędnych drzewa, z przypisanego materiału i zwęża się ku końcowi. `GenerateVinePath()` oblicza pełną trasę z `pointsPerVine` punktów. Kąt i sinusy rozmieszczają punkty spiralnie wokół pnia; `irregularity` i `sway` dodają nieregularne odchylenia. Wysokość rośnie wraz z parametrem `t`, więc trasa pnie się ku górze. Kolejne pnącza dostają opóźnienie `i * delayBetweenVines`.
+
+#### Krok 3: utworzenie świetlików
+
+`CreateFireflies()` tworzy grupę sfer. Usuwa ich collidery, wyłącza cienie i przypisuje `fireflyMaterial`; jeśli nie został ustawiony, używa `vineMaterial`. Każdy świetlik dostaje losowe przesunięcie i fazę, żeby nie poruszały się identycznie. Początkowa skala zero ukrywa je.
+
+#### Krok 4: sprawdzenie aktywacji
+
+W `Update()` efekt jest aktywny, jeśli `alwaysActive` jest włączone albo przypisany gracz znajduje się w odległości nie większej niż `activationDistance`. Przy przejściu z nieaktywnego stanu do aktywnego licznik `activationTimer` wraca do zera. Następnie skrypt aktualizuje pnącza i świetliki.
+
+#### Krok 5: odsłanianie i chowanie pnączy
+
+`UpdateVineGrowth()` zmienia postęp każdego pnącza w czasie. Podczas aktywacji wzrost zaczyna się po jego indywidualnym opóźnieniu; po dezaktywacji postęp maleje. `Mathf.Clamp01` utrzymuje go w zakresie 0–1.
+
+`UpdateVineGeometry()` pokazuje tylko początkową część zapisanej trasy. Liczba punktów zależy od postępu, a `Vector3.Lerp` wylicza dokładne położenie końcówki między dwoma punktami. W efekcie pnącze wygląda, jakby rosło po przygotowanej ścieżce, a przy chowaniu znika od końca.
+
+#### Krok 6: ruch świetlików
+
+`UpdateFireflies()` wylicza dla każdej sfery kąt wokół drzewa, wysokość i boczne kołysanie za pomocą sinusów i cosinusów. Wysokość powtarza się cyklicznie dzięki `Mathf.Repeat`. Skala pulsuje, a jej wielkość jest mnożona przez największy postęp pnączy (`totalProgress`): świetliki zwiększają się wraz z pojawianiem się pnączy i maleją, kiedy te znikają.
+
+#### Krok 7: sprzątanie
+
+`OnDestroy()` usuwa obiekt nadrzędny świetlików wraz z jego dziećmi. Pnącza są osobnymi dziećmi obiektu drzewa.
 
 ### 3. Jakie wartości można zmieniać?
 - `vineMaterial` — wymagany materiał pnączy; bez niego skrypt się wyłącza.
@@ -258,6 +525,8 @@ Punkty pnącza są obliczane raz na początku. Kąt i sinusy układają je w spi
 - Fazy i początkowe kąty są losowane. Częstotliwości falowania i pulsowania są wartościami wpisanymi w kodzie.
 
 ### 4. Dodatkowe informacje
+**Rodzaj zastosowanej techniki:** Proceduralnie wyliczane ścieżki LineRenderer oraz animowane sfery; efekt geometryczny, nie wolumetryczny.
+
 Pnącza i świetliki nie rzucają cieni. W `SampleScene` skrypt ma przypisanego gracza i `alwaysActive = false`: po zbliżeniu na 5 jednostek rozpoczyna wzrost, a po oddaleniu zwija pnącza. W prefabach `oak_tree (1)` i `sakura_tree` pole gracza jest puste, a stała aktywacja wyłączona; same prefaby bez przypisania gracza nie uruchomią efektu. Materiały przypisywane są w Inspectorze, a skrypt nie zmienia parametrów shaderów.
 
 ---
@@ -269,19 +538,36 @@ Pnącza i świetliki nie rzucają cieni. W `SampleScene` skrypt ma przypisanego 
 Steruje ruchem gracza z pierwszej osoby: WASD, rozglądaniem myszą, grawitacją i blokowaniem kursora.
 
 ### 2. Jak to jest zrobione?
-```csharp
-input = Vector2.ClampMagnitude(input, 1f);
-Vector3 direction = transform.right * input.x
-    + transform.forward * input.y;
-if (characterController.isGrounded && verticalVelocity < 0f)
-    verticalVelocity = -2f;
-verticalVelocity += gravity * Time.deltaTime;
-Vector3 velocity = direction * moveSpeed + Vector3.up * verticalVelocity;
-characterController.Move(velocity * Time.deltaTime);
-```
-Skrypt zbiera wciśnięte klawisze i zamienia je na kierunek względem obrotu gracza. Ograniczenie długości kierunku zapobiega szybszemu ruchowi po przekątnej. Grawitacja zwiększa prędkość pionową. Na ziemi ustawiana jest niewielka prędkość w dół, aby utrzymać kontakt z podłożem. CharacterController przesuwa postać i uwzględnia kolizje.
 
-Mysz obraca postać w poziomie i kamerę w pionie. Pochylenie kamery jest ograniczone. Escape pokazuje kursor, a kliknięcie ponownie go chowa i blokuje.
+Skrypt odczytuje klawisze WASD i mysz z nowego Unity Input System. `CharacterController` przesuwa postać i pilnuje kolizji, a osobny obrót kamery pozwala rozglądać się w pionie i poziomie.
+
+#### W skrócie
+
+Odczytuje WASD i mysz, obraca gracza oraz kamerę, a CharacterController przesuwa postać z grawitacją i kolizjami.
+
+#### Krok 1: pobranie komponentów i kamery
+
+W `Awake()` skrypt pobiera `CharacterController`. Jeśli `cameraTransform` nie został przypisany, szuka kamery w obiektach podrzędnych. W `Start()` brak kamery powoduje błąd i wyłączenie skryptu. Początkowy kąt kamery jest zapisywany jako `cameraPitch`, a następnie sprowadzany z zakresu 0–360 do wartości ujemnej lub dodatniej.
+
+#### Krok 2: przygotowanie kursora
+
+Na starcie kursor jest blokowany na środku ekranu i ukrywany. W `Update()` skrypt najpierw sprawdza, czy dostępna jest klawiatura. Escape odblokowuje kursor i pokazuje go; kliknięcie lewym przyciskiem ponownie blokuje i ukrywa kursor. Ruch i obrót są wykonywane tylko przy zablokowanym kursorze.
+
+#### Krok 3: obrót widoku myszą
+
+`LookAround()` odczytuje przesunięcie myszy. Ruch poziomy obraca cały obiekt gracza wokół osi Y, więc zmienia kierunek poruszania. Ruch pionowy zmienia `cameraPitch`; `Mathf.Clamp` ogranicza go do `-maxLookAngle` i `maxLookAngle`. Ten kąt jest ustawiany na lokalnym obrocie kamery, więc patrzenie w górę i dół nie przechyla całej postaci.
+
+#### Krok 4: zebranie kierunku ruchu
+
+`Move()` dodaje lub odejmuje składowe wektora wejścia dla klawiszy WASD. `Vector2.ClampMagnitude(input, 1f)` ogranicza długość wektora, dlatego ruch po przekątnej nie jest szybszy. Składowe są łączone z `transform.right` i `transform.forward`, więc kierunek ruchu odpowiada temu, w którą stronę obrócony jest gracz.
+
+#### Krok 5: grawitacja i przesunięcie
+
+Gdy postać stoi na ziemi, ujemna prędkość pionowa jest ustawiana na `-2f`, żeby utrzymać kontakt z podłożem. Następnie `gravity * Time.deltaTime` aktualizuje prędkość pionową. Ruch poziomy i pionowy są łączone w `velocity`, a `CharacterController.Move(velocity * Time.deltaTime)` wykonuje przesunięcie z uwzględnieniem kolizji.
+
+#### Krok 6: przywrócenie kursora
+
+`OnDisable()` odblokowuje i pokazuje kursor, aby po wyłączeniu komponentu nie pozostał ukryty.
 
 ### 3. Jakie wartości można zmieniać?
 - `moveSpeed = 5` — prędkość ruchu.
@@ -292,71 +578,11 @@ Mysz obraca postać w poziomie i kamerę w pionie. Pochylenie kamery jest ograni
 - Wartość przyklejenia do ziemi wynosi -2. Skrypt nie ma skoku.
 
 ### 4. Dodatkowe informacje
+**Rodzaj zastosowanej techniki:** Sterowanie rozgrywką i ruchem postaci; nie jest techniką renderowania.
+
 Wymaga CharacterController i aktywnej klawiatury z Input System. Brak przypisanej lub znalezionej kamery powoduje wyłączenie skryptu.
 
 ---
-
-## ReadmeEditor.cs
-**Plik:** `Assets/TutorialInfo/Scripts/Editor/ReadmeEditor.cs`
-
-### 1. Jaki efekt to daje?
-Pokazuje instrukcję projektu w Inspectorze: ikonę, tytuł, nagłówki, tekst i klikalne linki.
-
-### 2. Jak to jest zrobione?
-```csharp
-foreach (var section in readme.sections)
-{
-    if (!string.IsNullOrEmpty(section.heading))
-        GUILayout.Label(section.heading, HeadingStyle);
-    if (!string.IsNullOrEmpty(section.text))
-        GUILayout.Label(section.text, BodyStyle);
-    if (!string.IsNullOrEmpty(section.linkText))
-    {
-        if (LinkLabel(new GUIContent(section.linkText)))
-            Application.OpenURL(section.url);
-    }
-}
-```
-Skrypt przechodzi po sekcjach instrukcji i rysuje tylko niepuste elementy. Kliknięcie linku otwiera zapisany adres. Style tekstu tworzone są raz i używane ponownie. Pozostałe metody zaznaczają asset Readme, rysują nagłówek, przygotowują wygląd etykiet i mogą odtworzyć układ okien edytora.
-
-### 3. Jakie wartości można zmieniać?
-Nie ma pól efektu w Inspectorze. Treść pochodzi z Readme. Rozmiary tekstu ustawione w kodzie to 14, tytułu 26 i nagłówka 18; odstęp między częściami to 16. Kolor linku jest stały.
-
-### 4. Dodatkowe informacje
-To skrypt edytora, nie gry. Przywracanie układu korzysta z wewnętrznej funkcji Unity przez Reflection i może zależeć od wersji edytora.
-
----
-
-## Readme.cs
-**Plik:** `Assets/TutorialInfo/Scripts/Readme.cs`
-
-### 1. Jaki efekt to daje?
-Nie zmienia sceny. Przechowuje dane instrukcji wyświetlanej przez `ReadmeEditor`.
-
-### 2. Jak to jest zrobione?
-```csharp
-public Texture2D icon;
-public string title;
-public Section[] sections;
-public bool loadedLayout;
-
-[Serializable]
-public class Section
-{
-    public string heading, text, linkText, url;
-}
-```
-To asset Unity z ikoną, tytułem, listą sekcji i informacją o układzie edytora. Każda sekcja może zawierać nagłówek, tekst i link z adresem.
-
-### 3. Jakie wartości można zmieniać?
-- `icon`, `title`, `sections`, `loadedLayout` — dane głównego assetu.
-- `heading`, `text`, `linkText`, `url` — dane pojedynczej sekcji.
-- Kod nie przypisuje tym polom wartości początkowych.
-
-### 4. Dodatkowe informacje
-To element tutorialu edytora, a nie system rozgrywki.
-
-# Shadery
 
 ## Krysztal.shader
 **Plik:** `Assets/Shaders/Effects/Krysztal.shader`
@@ -365,15 +591,44 @@ To element tutorialu edytora, a nie system rozgrywki.
 Tworzy przezroczysty niebieski kryształ z jasnymi krawędziami. Krawędzie świecą mocniej, gdy patrzymy na powierzchnię pod ostrym kątem.
 
 ### 2. Jak to jest zrobione?
+
+Shader oblicza kolor kryształu dla każdego piksela. Środek powierzchni pozostaje bardziej przezroczysty, a krawędzie zwrócone bokiem do kamery dostają mocniejszy blask.
+
+#### W skrócie
+
+Porównuje normalną powierzchni z kierunkiem kamery, aby dodać kryształowi przezroczystość i mocniejszą poświatę na krawędziach.
+
+#### Krok 1: dane z modelu
+
+Vertex shader `Vert` pobiera pozycję i normalną każdego wierzchołka. Przelicza pozycję do przestrzeni ekranu, a normalną i kierunek do kamery przekazuje dalej. Dzięki temu fragment shader może wykonać obliczenia dla widocznych pikseli.
+
+#### Krok 2: sprawdzenie kąta patrzenia
+
 ```hlsl
 half fresnel = 1.0h - saturate(dot(normal, viewDir));
 fresnel = pow(fresnel, _FresnelPower);
+```
+
+Fragment shader normalizuje normalną powierzchni i kierunek do kamery. Iloczyn skalarny `dot` mówi, jak bardzo te kierunki są zgodne. Gdy kamera patrzy prosto na powierzchnię, wynik jest wysoki, a `1 - dot` daje mały efekt. Przy patrzeniu wzdłuż krawędzi zgodność maleje i wartość Fresnela rośnie. `pow` z `_FresnelPower` zmienia szerokość oraz skupienie tej krawędziowej poświaty.
+
+#### Krok 3: dodanie koloru i blasku
+
+```hlsl
 half3 fresnelEmission = _FresnelColor.rgb * fresnel
     * _FresnelStrength * _GlowStrength;
 half3 finalColor = baseColor + fresnelEmission;
-half alpha = saturate(_Transparency + fresnel * 0.35h);
 ```
-Wierzchołek przekazuje kierunek normalnej powierzchni i kierunek do kamery. Shader porównuje te kierunki. Patrząc prosto na ścianę kryształu, widzimy głównie kolor bazowy. Patrząc wzdłuż krawędzi, pojawia się więcej poświaty. Potęga zmienia szerokość tego przejścia. Poświata jest dodawana do koloru kryształu, a przezroczystość lekko rośnie przy krawędziach.
+
+Kolor krawędzi jest mnożony przez wartość Fresnela oraz dwa ustawienia siły, a następnie dodawany do `_CrystalColor`. Wartości HDR pozwalają uzyskać jasny kolor, który może współpracować z Bloom, jeśli jest włączony w post-processingu.
+
+#### Krok 4: przezroczystość krawędzi
+
+```hlsl
+half alpha = saturate(_Transparency + fresnel * 0.35h);
+return half4(finalColor, alpha);
+```
+
+Bazowa przezroczystość pochodzi z `_Transparency`. Przy krawędziach rośnie dodatkowo o część wartości Fresnela; `saturate` ogranicza ją do 0–1. Ustawienia `Blend SrcAlpha OneMinusSrcAlpha` mieszają kolor z tym, co znajduje się za kryształem. `ZWrite Off` oznacza, że shader nie zapisuje głębi, co jest typowe dla tej przezroczystej powierzchni.
 
 ### 3. Jakie wartości można zmieniać?
 - `_CrystalColor` — HDR, domyślnie `(0.15, 0.8, 1, 1)`. Kolor bazowy.
@@ -385,6 +640,8 @@ Wierzchołek przekazuje kierunek normalnej powierzchni i kierunek do kamery. Sha
 - Stałe w kodzie: krawędź może dodać do przezroczystości maksymalnie `0.35`.
 
 ### 4. Dodatkowe informacje
+**Rodzaj zastosowanej techniki:** Shader przezroczystości z efektem Fresnela zależnym od kąta widzenia; powierzchniowy, nie wolumetryczny.
+
 Shader URP miesza kolor z tłem, nie zapisuje głębi i renderuje przednie ściany modelu.
 
 ---
@@ -396,15 +653,45 @@ Shader URP miesza kolor z tłem, nie zapisuje głębi i renderuje przednie ścia
 Nadaje iskrom jasny rdzeń i miękką poświatę. Iskra dodaje światło do obrazu zamiast całkowicie zasłaniać tło.
 
 ### 2. Jak to jest zrobione?
+
+Shader rysuje na kwadracie okrągłą poświatę z jasnym środkiem. Nie potrzebuje tekstury: jasność każdego piksela wylicza z jego odległości od środka UV.
+
+#### W skrócie
+
+Z UV kwadratu wylicza odległość od środka i na jej podstawie tworzy miękkie halo oraz jasny rdzeń iskry.
+
+#### Krok 1: przekazanie pozycji i UV
+
+Vertex shader `Vert` przelicza wierzchołek kwadratu do przestrzeni projekcyjnej kamery i przekazuje jego UV do fragment shadera. UV określają, gdzie dany piksel leży na kwadracie.
+
+#### Krok 2: odległość od środka
+
 ```hlsl
 float2 p = input.uv * 2.0 - 1.0;
 float r = length(p);
+```
+
+UV z zakresu 0–1 zostaje przekształcone do zakresu -1–1, dzięki czemu środek kwadratu ma współrzędne `(0, 0)`. `length` oblicza odległość piksela od tego środka. Im większe `r`, tym dalej od centrum iskry.
+
+#### Krok 3: utworzenie halo i rdzenia
+
+```hlsl
 float halo = exp(-r * r * (3.0 / max(_Softness, 0.05)));
 float core = 1.0 - smoothstep(_CoreSize * 0.5, _CoreSize, r);
 float glow = saturate(halo * 0.65 + core);
-half3 color = _SparkColor.rgb * _Intensity * glow;
 ```
-Współrzędne kwadratu są przeliczane tak, aby jego środek był punktem zero. Odległość od środka określa jasność. Jedno obliczenie tworzy szeroką miękką poświatę, drugie mniejszy jasny rdzeń. Ich suma jest ograniczana do poprawnego zakresu i mnożona przez kolor oraz intensywność materiału. Ruch i zanikanie iskier wykonuje `ProceduralCrystalSparks`, a ten shader tworzy tylko ich świetlny wygląd.
+
+`halo` opada stopniowo wraz z odległością i tworzy miękką poświatę; `_Softness` zmienia jej rozłożenie. `core` tworzy mniejszy, jaśniejszy środek, a `_CoreSize` reguluje jego rozmiar. Shader łączy obie warstwy i ogranicza wynik do 0–1.
+
+#### Krok 4: kolor i mieszanie z obrazem
+
+```hlsl
+half3 color = _SparkColor.rgb * _Intensity * glow;
+half alpha = saturate(glow * _SparkColor.a);
+return half4(color, alpha);
+```
+
+Wynik poświaty mnoży kolor i intensywność materiału. Alfa wynika z jasności oraz kanału alfa koloru. Ustawienie `Blend SrcAlpha One` dodaje jasność iskry do tła. Shader nie zapisuje głębi (`ZWrite Off`) i rysuje obie strony kwadratu (`Cull Off`). Ruch, rozmiar wierzchołków oraz zanikanie iskier wykonuje skrypt `ProceduralCrystalSparks`, nie ten shader.
 
 ### 3. Jakie wartości można zmieniać?
 - `_SparkColor` — HDR, domyślnie `(0.1, 0.8, 1, 1)`. Kolor i alfa.
@@ -414,6 +701,8 @@ Współrzędne kwadratu są przeliczane tak, aby jego środek był punktem zero.
 - Stała `0.65` określa udział poświaty przy łączeniu jej z rdzeniem.
 
 ### 4. Dodatkowe informacje
+**Rodzaj zastosowanej techniki:** Proceduralny radialny blask obliczany na powierzchni kwadratu; nie jest wolumetryczny.
+
 Używa addytywnego mieszania z tłem, nie zapisuje głębi i renderuje obie strony kwadratu.
 
 ---
@@ -425,16 +714,40 @@ Używa addytywnego mieszania z tłem, nie zapisuje głębi i renderuje obie stro
 Dodaje mgłę zależną od odległości od kamery. Dalekie obiekty mieszają się z kolorem mgły; niebo otrzymuje osobną, łagodniejszą mgłę.
 
 ### 2. Jak to jest zrobione?
+
+To shader pełnoekranowy: bierze już wyrenderowany obraz i zmienia kolor jego pikseli. Odległe obiekty są coraz bardziej mieszane z kolorem mgły. Niebo, rozpoznawane po braku geometrii w głębi, dostaje osobną siłę mgły.
+
+#### W skrócie
+
+Odczytuje kolor i głębię obrazu, wylicza odległość obiektów od kamery i miesza ich kolor z kolorem mgły.
+
+#### Krok 1: pobranie obrazu i głębi
+
+Dla każdego piksela shader pobiera kolor z `_BlitTexture` oraz wartość z tekstury głębi. Głębia mówi, jak daleko znajduje się widoczna powierzchnia. Kod sprawdza też konwencję `UNITY_REVERSED_Z`, bo na niektórych platformach wartości głębi są zapisane w odwrotnym kierunku. Wartość graniczna oznacza niebo; wtedy kolor sceny jest od razu mieszany z `_FogColor` według `_SkyFogStrength`.
+
+#### Krok 2: odtworzenie odległości obiektu
+
+Jeżeli piksel należy do geometrii, `ComputeWorldSpacePosition` odtwarza pozycję tej powierzchni w świecie z UV, głębi i odwrotnej macierzy widoku/projekcji. Shader mierzy odległość tej pozycji od `_WorldSpaceCameraPos`.
+
+#### Krok 3: przeliczenie odległości na siłę mgły
+
 ```hlsl
 float distanceFactor = saturate(
     (distanceToCamera - _FogStart) /
     max(_FogEnd - _FogStart, 0.001));
-float distanceFog =
-    (1.0 - exp(-_FogDensity * distanceFactor)) / denominator;
+float distanceFog = (1.0 - exp(-_FogDensity * distanceFactor)) / denominator;
+```
+
+`_FogStart` i `_FogEnd` określają zakres odległości, w którym mgła narasta. `saturate` ogranicza obliczony czynnik do 0–1. Funkcja wykładnicza sprawia, że narastanie nie jest liniowe; mianownik normalizuje wynik i ma zabezpieczenie przed dzieleniem przez zero.
+
+#### Krok 4: zmieszanie koloru
+
+```hlsl
 float fogFactor = lerp(_NearFogStrength, 1.0, saturate(distanceFog));
 half3 finalColor = lerp(sceneColor.rgb, _FogColor.rgb, saturate(fogFactor));
 ```
-Shader pobiera gotowy kolor sceny oraz mapę głębokości. Głębia pozwala odtworzyć położenie widocznego obiektu i zmierzyć jego odległość od kamery. Odległość jest przeliczana na stopień zamglenia, po czym kolor obiektu jest mieszany z kolorem mgły. Niebo rozpoznawane jest po braku geometrii w mapie głębokości i ma osobną siłę. Wartości graniczne zabezpieczają obliczenia przed dzieleniem przez zero.
+
+Nawet blisko kamery może pozostać niewielka mgła ustawiona przez `_NearFogStrength`. Im dalej leży obiekt, tym bardziej jego kolor zbliża się do `_FogColor`. Shader zachowuje alfę oryginalnego obrazu. `ZTest Always` pozwala przetworzyć każdy piksel obrazu, a `ZWrite Off` nie zapisuje nowej głębi.
 
 ### 3. Jakie wartości można zmieniać?
 - `_FogColor` — HDR, domyślnie `(0.48, 0.66, 0.64, 1)`. Kolor mgły.
@@ -446,7 +759,9 @@ Shader pobiera gotowy kolor sceny oraz mapę głębokości. Głębia pozwala odt
 - Zabezpieczenia w kodzie używają minimum `0.001` dla dzielników.
 
 ### 4. Dodatkowe informacje
-To ekranowy efekt URP korzystający z głębi obrazu. Nie jest dymem w przestrzeni i nie korzysta z pozycji gracza. Mgłę przy graczu tworzy osobny `GroundFog.shader`.
+**Rodzaj zastosowanej techniki:** Ekranowa mgła zależna od głębi i odległości; post-process, nie wolumetryczna objętość.
+
+To ekranowy efekt URP korzystający z głębi obrazu. Nie jest dymem w przestrzeni i nie korzysta z pozycji gracza. Mgłę przy graczu tworzy osobny `GroundFog.shader`. W `Assets/Settings/PC_Renderer.asset` znajduje się aktywna funkcja Renderer Feature o nazwie `Fog`, której materiałem przebiegu jest `FogMat`. `PC_RPAsset` wskazuje ten renderer.
 
 ---
 
@@ -457,17 +772,39 @@ To ekranowy efekt URP korzystający z głębi obrazu. Nie jest dymem w przestrze
 Dodaje na obrazie promienie wychodzące z miejsca światła widocznego na ekranie. Są silniejsze, gdy w kierunku światła widoczne jest niebo, i słabsze, gdy drogę zasłania obiekt.
 
 ### 2. Jak to jest zrobione?
+
+Shader dodaje do gotowego obrazu ekranowe smugi skierowane od pozycji światła. W każdej pozycji ekranu sprawdza próbki głębi wzdłuż linii prowadzącej do światła i wykorzystuje widoczne obszary nieba do budowania promieni. Mimo nazwy `Volumetric God Rays` nie wykonuje ray marchingu przez rzeczywistą objętość świata — jest to efekt ekranowy.
+
+#### W skrócie
+
+Próbkuje głębię po ekranowej linii od piksela do światła i na podstawie widocznego nieba dodaje promienie do obrazu.
+
+#### Krok 1: pobranie obrazu i pozycji światła
+
+Shader pobiera kolor sceny i teksturę głębi. Pozycję światła na ekranie odczytuje z `_LightScreenPos`, którą ustawia `GodRaysController`. UV aktualnego piksela i UV światła wyznaczają kierunek próbkowania.
+
+#### Krok 2: wyznaczenie linii próbek
+
 ```hlsl
 float2 rayVector = (lightUV - uv) * _RayDensity;
 int samples = clamp((int)_RaySamples, 8, 32);
 float t = (i + 0.5) / samples;
 float2 sampleUV = uv + rayVector * t;
-illumination += skyMask * decay;
-weightSum += decay;
-decay *= _RayWeight;
+```
+
+`rayVector` prowadzi od badanego piksela w stronę światła; `_RayDensity` skaluje długość tej drogi. Pętla dzieli ją na próbki, a `t` ustala położenie każdej z nich. Liczba próbek jest ograniczona do 8–32, niezależnie od ustawienia materiału.
+
+#### Krok 3: sprawdzenie nieba i zsumowanie światła
+
+Dla każdej pozycji shader odczytuje głębię i tworzy maskę nieba z uwzględnieniem reversed Z. Próbki nieba dodają wkład do `illumination`, ważony przez `decay`. Po każdym kroku `decay` jest mnożone przez `_RayWeight`, więc kolejne próbki mają stopniowo mniejszy wpływ. `weightSum` pozwala znormalizować sumę.
+
+#### Krok 4: nałożenie promieni na scenę
+
+```hlsl
 float visibility = illumination / max(weightSum, 0.0001);
 ```
-Dla każdego piksela shader wyznacza kierunek do pozycji światła przekazanej przez `GodRaysController`. Wzdłuż tego kierunku sprawdza kilka miejsc mapy głębokości. Miejsca będące niebem dodają wkład do wyniku, a kolejne próbki mają coraz mniejszą wagę. Wynik jest uśredniany i porównywany z progiem. Jeśli jest wystarczająco wysoki, shader dodaje do obrazu kolor promieni.
+
+Po normalizacji shader porównuje wynik z `_RayThreshold`. Widoczność, `_RayIntensity`, `_RayExposure` i `_RayColor` określają końcowy wkład promieni do obrazu. Materiał jest nakładany jako przebieg pełnoekranowy; `ZTest Always` przetwarza cały obraz, a `ZWrite Off` nie zmienia jego głębi.
 
 ### 3. Jakie wartości można zmieniać?
 - `_RayColor` — HDR `(0.75, 0.85, 1, 1)`. Kolor promieni.
@@ -481,7 +818,9 @@ Dla każdego piksela shader wyznacza kierunek do pozycji światła przekazanej p
 - Pętla ma limit 32 próbek, niezależnie od wartości materiału.
 
 ### 4. Dodatkowe informacje
-To efekt ekranowy, nie rzeczywiste światło wolumetryczne. Shader korzysta z obrazu i głębi sceny, nie zapisuje własnej głębi.
+**Rodzaj zastosowanej techniki:** Ekranowy efekt promieni wyliczany przez próbkowanie głębi w kierunku światła; nie jest wolumetryczny.
+
+To efekt ekranowy, nie rzeczywiste światło wolumetryczne. Shader korzysta z obrazu i głębi sceny, nie zapisuje własnej głębi. W `Assets/Settings/PC_Renderer.asset` znajduje się aktywna funkcja Renderer Feature o nazwie `GodRays`, której materiałem przebiegu jest `GodRays_Mat`. `PC_RPAsset` wskazuje ten renderer. W konfiguracji `Mobile_Renderer` lista Renderer Features jest pusta, więc ta informacja dotyczy renderera PC.
 
 ---
 
@@ -492,23 +831,48 @@ To efekt ekranowy, nie rzeczywiste światło wolumetryczne. Shader korzysta z ob
 Tworzy półprzezroczysty, animowany obłok dymu z większymi plamami, drobnymi detalami, unoszeniem i wirowaniem. Dym jest rzadszy blisko gracza.
 
 ### 2. Jak to jest zrobione?
+
+Ten shader tworzy dym wewnątrz bryły, przez którą patrzy kamera. Zamiast obliczyć jeden kolor na powierzchni, przechodzi promieniem kamery przez wnętrze obłoku i wielokrotnie sprawdza, ile dymu znajduje się na jego drodze. To rzeczywisty efekt wolumetryczny liczony metodą ray marchingu.
+
+#### W skrócie
+
+Przechodzi promieniem kamery przez bryłę mgły, oblicza szum i gęstość w wielu punktach oraz osłabia dym blisko pozycji gracza.
+
+#### Krok 1: znalezienie odcinka promienia wewnątrz bryły
+
+Dla piksela shader wyznacza promień od kamery i sprawdza, gdzie przecina on ograniczającą bryłę. Jeśli nie przecina bryły, piksel jest odrzucany. Głębia sceny pozwala skrócić promień do najbliższej widocznej powierzchni, żeby dym nie pojawiał się za terenem lub innymi obiektami.
+
+#### Krok 2: podział drogi na próbki
+
 ```hlsl
 #define STEPS 32
-float broadShape = FBM(warpedP * _SmokeScale);
-float detail = FBM(warpedP * _DetailScale);
-float noiseValue = broadShape * 0.75 + detail * 0.25;
-float density = smoothstep(0.35, 0.35 + _Softness, noiseValue);
-float playerDistance = distance(sampleWorldPos.xz, _PlayerPosition.xz);
-float playerMask = smoothstep(_ExclusionRadius,
-    _ExclusionRadius + _ExclusionFeather, playerDistance);
-density *= playerMask;
-float alpha = 1.0 - exp(-density * _Density * stepSize * 3.0);
+float stepSize = (tFar - tNear) / STEPS;
 ```
-Kamera patrzy przez bryłę obłoku. Shader wyznacza, gdzie promień kamery wchodzi do bryły i ją opuszcza, a mapę głębokości wykorzystuje, by nie rysować dymu przed najbliższym obiektem. Pozostały odcinek dzieli na 32 próbki.
 
-W każdej próbce kilka warstw proceduralnego szumu tworzy nieregularne obłoki i szczegóły. Przesuwanie i zniekształcanie współrzędnych daje unoszenie i wir. Miękkie progi zamieniają szum na gęstość, a maski pionowe wygładzają dół i górę obłoku.
+Odcinek od `tNear` do `tFar` jest dzielony na 32 równe kroki. W każdej iteracji pętli shader bierze środek kolejnego kroku i oblicza tam lokalną gęstość oraz kolor dymu.
 
-Dla każdej próbki shader porównuje położenie na płaszczyźnie poziomej z pozycją gracza przekazaną przez `FogPlayerExclusion`. W promieniu gracza gęstość maleje; na krawędzi wraca stopniowo. Potem każda próbka dodaje kolor i przezroczystość do wyniku. Gdy obłok jest prawie kryjący, shader kończy liczenie wcześniejszym wyjściem z pętli.
+#### Krok 3: animacja i nieregularny kształt dymu
+
+Współrzędne próbki są przesuwane w pionie przez `_RiseSpeed`, co sprawia, że wzór wygląda na unoszący się. Sinus i cosinus z `_SwirlSpeed` oraz `_WarpStrength` delikatnie odchylają współrzędne, tworząc skręt. Następnie kilka wywołań `Noise3D` tworzy wektor zniekształcenia. To **domain warping**: szum przesuwa współrzędne, z których dopiero potem pobierane są kolejne warstwy szumu.
+
+`FBM` jest liczone osobno dla dużych form (`_SmokeScale`) i drobnych szczegółów (`_DetailScale`). Wyniki łączą się z wagami `0.75` i `0.25`. Funkcja `smoothstep` zamienia szum w miękką maskę gęstości zamiast ostrego progu.
+
+#### Krok 4: wygładzenie granic i wykluczenie przy graczu
+
+Maski `bottomFade` i `topFade` zmniejszają gęstość przy dolnej i górnej granicy bryły. Potem shader przelicza pozycję próbki na świat i mierzy jej poziomą odległość od `_PlayerPosition`. `smoothstep` tworzy miękką granicę obszaru wykluczenia: blisko gracza dym jest osłabiony, a dalej stopniowo odzyskuje gęstość. Pozycję gracza przekazuje `FogPlayerExclusion` przez `MaterialPropertyBlock`.
+
+#### Krok 5: obliczenie przezroczystości i koloru próbki
+
+```hlsl
+float alpha = 1.0 - exp(-density * _Density * stepSize * 3.0);
+float3 sampleColor = lerp(_SmokeColor.rgb, _GlowColor.rgb, glow);
+```
+
+Gęstość, `_Density` i długość kroku określają, jak bardzo pojedyncza próbka zasłania to, co za nią. Wzór wykładniczy nawiązuje do tłumienia światła w ośrodku. Wartość szumu steruje przejściem między kolorem dymu a kolorem rozświetlenia.
+
+#### Krok 6: składanie próbek w końcowy obłok
+
+Każda próbka jest dodawana od przodu do tyłu z uwzględnieniem przezroczystości, która jeszcze pozostała. Gdy zgromadzona alfa przekroczy `0.98`, pętla się kończy, bo dalsze próbki prawie nie zmienią wyniku. Jeśli dym jest prawie niewidoczny, piksel jest odrzucany; w przeciwnym razie shader zwraca skumulowany kolor i alfę.
 
 ### 3. Jakie wartości można zmieniać?
 - `_SmokeColor` — HDR `(0.35, 0.45, 0.55, 1)`. Główny kolor dymu.
@@ -528,6 +892,8 @@ Dla każdej próbki shader porównuje położenie na płaszczyźnie poziomej z p
 - Stałe kodu: 32 kroki, udział dużych kształtów 0.75, detali 0.25, próg szumu 0.35 i mnożnik przezroczystości 3.
 
 ### 4. Dodatkowe informacje
+**Rodzaj zastosowanej techniki:** Wolumetryczny ray marching połączony z proceduralnym szumem 3D, FBM i domain warping.
+
 Shader jest przezroczysty, korzysta z głębi, rysuje wewnętrzne powierzchnie bryły i nie zapisuje głębi. Koszt zależy od liczby pikseli obłoku i 32 próbek. Materiał `GroundFog_Mat` jest użyty na rendererach ze skryptem wykluczenia w scenach `Scene1` i `SampleScene`.
 
 ## Grass.shader
@@ -537,24 +903,36 @@ Shader jest przezroczysty, korzysta z głębi, rysuje wewnętrzne powierzchnie b
 Nadaje źdźbłom gradient od ciemnej zieleni przy ziemi do turkusu na końcach. Końcówki świecą, a źdźbła poruszają się jak na wietrze.
 
 ### 2. Jak to jest zrobione?
+
+Generator przygotowuje źdźbła jako siatkę, a shader w czasie renderowania porusza jej wierzchołkami i dobiera kolor według wysokości. W ten sposób ta sama geometria może falować na wietrze bez przesuwania całego źdźbła jako obiektu.
+
+#### W skrócie
+
+Przesuwa wierzchołki źdźbeł sinusoidalnym wiatrem, dobiera kolor według wysokości i rozjaśnia ich końcówki emisją.
+
+#### Krok 1: przygotowanie pozycji i wysokości
+
+Vertex shader przelicza pozycje źdźbła do przestrzeni świata. Wysokość wierzchołka jest używana jako informacja, czy znajduje się blisko podstawy, czy końcówki. Wierzchołki i kolory początkowe przygotowuje `MagicalGrassGenerator`.
+
+#### Krok 2: przesunięcie wierzchołków przez wiatr
+
 ```hlsl
 float wind = sin(_Time.y * _WindSpeed
     + positionWS.x * _WindScale
     + positionWS.z * _WindScale);
 float bend = height * height;
 positionWS.x += wind * _WindStrength * bend;
-positionWS.z += cos(_Time.y * _WindSpeed * 0.7
-    + positionWS.x * _WindScale) * _WindStrength * bend * 0.5;
-
-float3 baseToMiddle = lerp(_BaseColor.rgb, _MiddleColor.rgb,
-    smoothstep(0.0, 0.65, height));
-float3 grassColor = lerp(baseToMiddle, _TipColor.rgb,
-    smoothstep(0.65, 1.0, height));
-float3 emission = _TipColor.rgb * tipMask * _EmissionStrength;
 ```
-Shader przelicza wierzchołki do przestrzeni świata. Wysokość źdźbła jest podnoszona do kwadratu przed zastosowaniem wiatru, więc podstawa prawie się nie rusza, a końcówka mocniej się wychyla. Sinus i cosinus poruszają źdźbło w dwóch kierunkach. Położenie w świecie różnicuje fazę wiatru w różnych częściach łąki.
 
-Kolor zależy od wysokości: shader miesza kolor podstawy ze środkowym, a potem dodaje kolor końcówki. Kolor wierzchołków przygotowany przez generator lekko rozjaśnia lub przyciemnia wynik. Osobna maska obejmuje końcówkę, gdzie dodawana jest emisja.
+`_Time.y` zmienia falę w czasie, `_WindSpeed` steruje jej tempem, a współrzędne świata sprawiają, że wiatr ma różną fazę w różnych miejscach. `height * height` sprawia, że podstawa prawie się nie rusza, a wyżej położone wierzchołki wychylają się mocniej. Druga składowa oparta na cosinusie dodaje ruch w osi Z.
+
+#### Krok 3: utworzenie gradientu koloru
+
+Shader miesza `_BaseColor` z `_MiddleColor`, a potem ze `_TipColor`, korzystając z wysokości i `smoothstep`. Dzięki miękkim przejściom dół, środek i końcówka źdźbła nie mają ostrych granic. Kolor wierzchołka dostarczony przez generator dodaje niewielkie zróżnicowanie między źdźbłami.
+
+#### Krok 4: rozświetlenie końcówek
+
+Maska `tipMask` obejmuje końcową część źdźbła. Shader mnoży ją przez kolor końcówki i `_EmissionStrength`, a następnie dodaje emisję do koloru. Wiatr, gradient i emisja są obliczane w shaderze; ustawienia renderowania decydują m.in. o tym, że źdźbła są widoczne z obu stron.
 
 ### 3. Jakie wartości można zmieniać?
 - `_BaseColor` — `(0.025, 0.12, 0.045, 1)`. Kolor nasady.
@@ -568,6 +946,8 @@ Kolor zależy od wysokości: shader miesza kolor podstawy ze środkowym, a potem
 - Stałe w kodzie: gradient przechodzi przez wysokości 0.65, maska końców zaczyna się przy 0.72, a jasność koloru wierzchołka zmienia się od 0.85 do 1.15.
 
 ### 4. Dodatkowe informacje
+**Rodzaj zastosowanej techniki:** Animacja wierzchołków przez ich przesuwanie, gradient kolorów i emisja; nie jest wolumetryczny.
+
 Shader URP rysuje obie strony źdźbeł i zapisuje głębię. Geometrię i kolor wierzchołków przygotowuje `MagicalGrassGenerator`; ruch wiatru oraz gradient wykonuje shader.
 
 ---
@@ -579,22 +959,46 @@ Shader URP rysuje obie strony źdźbeł i zapisuje głębię. Geometrię i kolor
 Nakłada teksturę na model, wycina jej przezroczyste fragmenty i dodaje pulsujący blask w górnej części. Materiały `grzybyMat` i `grzyby2Mat` korzystają z tego shadera.
 
 ### 2. Jak to jest zrobione?
+
+Shader pobiera teksturę grzyba, usuwa z obrazu piksele przezroczyste i dodaje pulsującą poświatę do wybranego obszaru modelu. Poświata jest liczona osobno dla każdego piksela na podstawie jego wysokości.
+
+#### W skrócie
+
+Nakłada teksturę, odrzuca przezroczyste piksele i dodaje pulsującą emisję do określonej wysokości modelu.
+
+#### Krok 1: pobranie tekstury i koloru
+
+Vertex shader przekazuje do fragment shadera UV tekstury oraz wysokość w lokalnych współrzędnych modelu. Fragment shader pobiera `_BaseMap` w tym miejscu i mnoży próbkę przez `_BaseColor`.
+
+#### Krok 2: wycięcie przezroczystych fragmentów
+
 ```hlsl
-half4 baseSample = SAMPLE_TEXTURE2D(
-    _BaseMap, sampler_BaseMap, input.uv) * _BaseColor;
 clip(baseSample.a - _AlphaClip);
+```
+
+Jeśli alfa tekstury jest poniżej progu `_AlphaClip`, `clip` odrzuca piksel. Dzięki temu kształt grzyba może mieć wycięte brzegi z tekstury bez klasycznego półprzezroczystego mieszania.
+
+#### Krok 3: wyznaczenie miejsca świecenia
+
+```hlsl
 half mask = smoothstep(
     _MaskHeight - _MaskFeather,
     _MaskHeight + _MaskFeather,
     input.localHeight);
+```
+
+`_MaskHeight` ustala wysokość, przy której zaczyna się maska emisji. `_MaskFeather` określa szerokość miękkiego przejścia. Poniżej maski wkład poświaty jest mniejszy, powyżej większy.
+
+#### Krok 4: pulsowanie i dodanie emisji
+
+```hlsl
 half pulse = 1.0h - _PulseAmount * 0.5h
     + _PulseAmount * 0.5h * sin(_Time.y * _PulseSpeed);
 half3 emission = _GlowColor.rgb * _GlowStrength
     * _BloomBoost * pulse * mask;
 ```
-Wierzchołki dostają pozycję w modelu, współrzędne tekstury i względną wysokość. Dla każdego piksela shader pobiera teksturę i nakłada kolor materiału. Przezroczyste fragmenty poniżej progu są odrzucane, co tworzy wycięte brzegi bez standardowego mieszania przezroczystości.
 
-Wysokość modelu określa obszar świecenia, a miękkie przejście ogranicza ostrą granicę. Sinus zmienia jasność w czasie. Emisja miesza kolor blasku, jego siłę, pulsowanie, wzmocnienie Bloom i maskę wysokości. Na końcu emisja jest dodawana do koloru tekstury.
+Sinus zmienia jasność w czasie: `_PulseSpeed` steruje tempem, a `_PulseAmount` zakresem pulsowania. Kolor `_GlowColor`, `_GlowStrength` i `_BloomBoost` określają siłę rozświetlenia; wynik jest ograniczony maską wysokości. Emisja zostaje dodana do koloru tekstury. Efekt Bloom wokół grzyba zależy dodatkowo od konfiguracji post-processingu.
 
 ### 3. Jakie wartości można zmieniać?
 - `_BaseMap` — tekstura obiektu; domyślnie biała.
@@ -611,6 +1015,8 @@ Wysokość modelu określa obszar świecenia, a miękkie przejście ogranicza os
 - W kodzie pulsowanie ma wartość bazową `1 - PulseAmount/2` i amplitudę `PulseAmount/2`.
 
 ### 4. Dodatkowe informacje
+**Rodzaj zastosowanej techniki:** Shader teksturowany z odrzucaniem alfa i animowaną emisją maskowaną wysokością; efekt powierzchniowy.
+
 Shader URP renderuje obie strony, zapisuje głębię i odrzuca piksele na podstawie alfy. Bloom widoczny wokół modelu zależy także od ustawień post-processingu.
 
 ---
@@ -622,18 +1028,34 @@ Shader URP renderuje obie strony, zapisuje głębię i odrzuca piksele na podsta
 Nadaje liściom proceduralne różnice kolorów, główną żyłkę i żyłki boczne. Materiały `TreeSpirals_Mat1`, `TreeSpirals_Mat2` i `TreeSpirals_Mat3` korzystają z tego shadera.
 
 ### 2. Jak to jest zrobione?
+
+Shader oblicza wzór liści bez osobnej tekstury: wykorzystuje UV modelu, czyli położenie fragmentu na powierzchni. Z tych współrzędnych tworzy plamy i żyłki, a potem oblicza kolor powierzchni z uwzględnieniem światła.
+
+#### W skrócie
+
+Z UV oblicza wzór plam i żyłek liścia, a następnie uwzględnia światło przy wyznaczaniu jego koloru.
+
+#### Krok 1: utworzenie plam na liściu
+
 ```hlsl
 float pattern = sin(uv.y * 31.0 + sin(uv.x * 17.0) * 1.7)
     * sin(uv.y * 11.0 + uv.x * 9.0);
 pattern = pattern * 0.5 + 0.5;
 float3 color = lerp(_DarkColor.rgb, _LightColor.rgb, pattern);
 color = lerp(_BaseColor.rgb, color, _Variation);
-float centerVein = 1.0 - smoothstep(
-    0.0, 0.10, abs(uv.x - 0.5));
 ```
-Shader nie pobiera tekstury wzoru liścia. Na podstawie położenia na powierzchni oblicza kilka fal, które tworzą nieregularne plamy. Wynik miesza ciemny, jasny i bazowy kolor. Odległość od środka współrzędnych liścia tworzy główną żyłkę; dodatkowe falowanie i maski tworzą żyłki boczne. Ich kolor nakładany jest na powierzchnię.
 
-Następnie shader przelicza normalną liścia i porównuje ją z kierunkiem głównego światła, dodaje światło otoczenia oraz skupione odbicie. Liście są nieprzezroczyste i renderowane z obu stron. Shader nie zawiera efektu fali świetlnej.
+Dwie fale sinusoidalne, w tym jedna zniekształcona przez drugą, dają nieregularny wzór. Pierwsze przekształcenie przenosi wynik do zakresu użytecznego jako waga koloru. `lerp` miesza kolor ciemny z jasnym, a `_Variation` określa, jak mocno wzór różni się od `_BaseColor`.
+
+#### Krok 2: dodanie żyłek
+
+Shader mierzy odległość `uv.x` od środka liścia i przez `smoothstep` tworzy główną żyłkę. Podobne maski i fale wyznaczają żyłki boczne. Ich kolory są nakładane na wcześniej obliczony kolor plam. Położenie i szerokość tych elementów wynikają z UV oraz stałych zapisanych w shaderze.
+
+#### Krok 3: oświetlenie powierzchni
+
+Vertex shader przekazuje normalną liścia i dane potrzebne do obliczenia kierunku światła oraz kamery. Fragment shader porównuje normalną z kierunkiem głównego światła, dodaje światło otoczenia i oblicza skupione odbicie. Wynik oświetlenia wpływa na jasność wzoru.
+
+Shader nie korzysta z tekstury wzoru, jest nieprzezroczysty i renderuje obie strony liścia. Nie zawiera animacji fali ani nie odczytuje pozycji gracza; aktywację pnączy obsługuje osobny `MagicTreeVines`.
 
 ### 3. Jakie wartości można zmieniać?
 - `_BaseColor` — `(0.10, 0.16, 0.045, 1)`. Podstawowy kolor liścia.
@@ -647,6 +1069,8 @@ Następnie shader przelicza normalną liścia i porównuje ją z kierunkiem gł�
 - Materiały zawierają również `_WaveHeight` i `_Activation`, lecz ten shader ich nie używa.
 
 ### 4. Dodatkowe informacje
+**Rodzaj zastosowanej techniki:** Proceduralny wzór liści liczony ze współrzędnych UV oraz oświetlenie powierzchniowe; nie jest wolumetryczny.
+
 Shader jest przeznaczony dla URP. Używa przebiegu oświetlanego, zapisuje głębię i nie odrzuca tylnej strony liścia.
 
 
@@ -705,5 +1129,11 @@ Kształt dymu powstaje z kilku warstw szumu o różnej skali. Shader odkształca
 ## Krótka rekomendacja do prezentacji
 
 Najlepiej zbudować prezentację wokół trzech łatwych do pokazania przykładów: kryształu z Fresnelem jako efektu materiałowego, iskier jako efektu dynamicznego oraz GroundFog jako zaawansowanego efektu reagującego na gracza. Pokazują one kolejne poziomy trudności i mają konkretne potwierdzenie w kodzie projektu. Pnącza można pokazać jako efekt aktywowany przez zbliżenie gracza: `MagicTreeVines` sprawdza odległość i rozpoczyna ich wzrost.
+
+
+
+
+
+
 
 
